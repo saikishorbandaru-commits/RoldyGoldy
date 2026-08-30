@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ==========================================
-// 🎨 PALETTE & THEME
+// 🎨 PALETTE & STYLING
 // ==========================================
 class AppColors {
   static const Color wineDark = Color(0xFF140C07);
@@ -36,12 +36,32 @@ class Product {
   final bool isTrialEligible;
   final String tag;
   final String karatInfo;
+  final String grossWeight;
+  final String netWeight;
+  final String metalType;
+  final String stoneType;
+  final String size;
+  final String closure;
+  final String hallmark;
   final String description;
 
   Product({
-    required this.id, required this.name, required this.category,
-    required this.price, required this.originalPrice, required this.emoji,
-    this.isTrialEligible = true, required this.tag, required this.karatInfo,
+    required this.id,
+    required this.name,
+    required this.category,
+    required this.price,
+    required this.originalPrice,
+    required this.emoji,
+    this.isTrialEligible = true,
+    required this.tag,
+    required this.karatInfo,
+    required this.grossWeight,
+    required this.netWeight,
+    required this.metalType,
+    required this.stoneType,
+    required this.size,
+    required this.closure,
+    required this.hallmark,
     required this.description,
   });
 }
@@ -50,7 +70,9 @@ class CartItem {
   final Product product;
   int quantity;
   double? customPrice;
+
   CartItem({required this.product, this.quantity = 1, this.customPrice});
+
   double get unitPrice => customPrice ?? product.price;
   double get total => unitPrice * quantity;
 }
@@ -63,11 +85,20 @@ class OrderItem {
   final String status;
   final String date;
   final bool isTrial;
-  OrderItem({required this.orderId, required this.productName, required this.emoji, required this.amount, required this.status, required this.date, this.isTrial = false});
+
+  OrderItem({
+    required this.orderId,
+    required this.productName,
+    required this.emoji,
+    required this.amount,
+    required this.status,
+    required this.date,
+    this.isTrial = false,
+  });
 }
 
 // ==========================================
-// 🧠 GLOBAL STATE
+// 🧠 GLOBAL APP STATE
 // ==========================================
 class AppState extends ChangeNotifier {
   bool isFirstTimeUser = true;
@@ -77,10 +108,79 @@ class AppState extends ChangeNotifier {
   String selectedPincode = "500101";
 
   final List<Product> products = [
-    Product(id: '1', name: 'Kundan Choker Necklace', category: 'Bridal', price: 3499, originalPrice: 4899, emoji: '👑', tag: 'HOT', karatInfo: '1-Gram Matte Gold Plated', description: 'Royal bridal choker set with Kundan setting and velvet trousseau box.'),
-    Product(id: '2', name: 'Korean Minimal Hoops', category: 'Daily Wear', price: 349, originalPrice: 549, emoji: '💫', tag: 'NEW', karatInfo: '18K PVD Anti-Tarnish', isTrialEligible: false, description: 'Waterproof daily-wear minimal hoops with hypoallergenic titanium core.'),
-    Product(id: '3', name: 'Temple Deity Jhumka Set', category: 'Temple', price: 1299, originalPrice: 1899, emoji: '🪔', tag: 'BESTSELLER', karatInfo: 'Antique Micro-Gold', description: 'South Indian temple deity motif with ruby kemp stones.'),
-    Product(id: '4', name: 'Polki Bridal Maangtikka', category: 'Bridal', price: 2899, originalPrice: 3599, emoji: '💍', tag: 'HOT', karatInfo: 'Uncut Polki Foil', description: 'Floral bridal maangtikka with hanging dark green onyx drops.'),
+    Product(
+      id: '1',
+      name: 'Kundan Choker Necklace',
+      category: 'Bridal',
+      price: 3499,
+      originalPrice: 4899,
+      emoji: '👑',
+      tag: 'HOT',
+      karatInfo: '1-Gram Matte Gold Plated',
+      grossWeight: '48.5 g',
+      netWeight: '36.2 g',
+      metalType: 'Brass & Copper Alloy',
+      stoneType: 'Hand-cut Kundan & Emeralds',
+      size: 'Adjustable 12–18 in',
+      closure: 'Golden Zari Dori',
+      hallmark: 'RG 1-Gram Certified',
+      description: 'Royal bridal choker set with Kundan foil work and velvet trousseau box packaging.',
+    ),
+    Product(
+      id: '2',
+      name: 'Korean Minimal Hoops',
+      category: 'Daily Wear',
+      price: 349,
+      originalPrice: 549,
+      emoji: '💫',
+      tag: 'NEW',
+      karatInfo: '18K PVD Anti-Tarnish',
+      isTrialEligible: false,
+      grossWeight: '6.8 g',
+      netWeight: '6.8 g',
+      metalType: '316L Surgical Titanium',
+      stoneType: 'AAA+ Cubic Zirconia',
+      size: '18mm Diameter',
+      closure: 'Click-top Latch',
+      hallmark: '18K PVD Certified',
+      description: 'Waterproof daily minimal hoops with hypoallergenic titanium core.',
+    ),
+    Product(
+      id: '3',
+      name: 'Temple Deity Jhumka Set',
+      category: 'Temple',
+      price: 1299,
+      originalPrice: 1899,
+      emoji: '🪔',
+      tag: 'BESTSELLER',
+      karatInfo: 'Antique Micro-Gold',
+      grossWeight: '38.2 g',
+      netWeight: '30.5 g',
+      metalType: "Jeweller's Bronze Alloy",
+      stoneType: 'Kemp Stones & Pearls',
+      size: 'Adjustable 14–16 in',
+      closure: 'Metallic Lobster Lock',
+      hallmark: 'Micro-Gold Guaranteed',
+      description: 'South Indian temple deity motif sculpted with ruby kemp stones.',
+    ),
+    Product(
+      id: '4',
+      name: 'Polki Bridal Maangtikka',
+      category: 'Bridal',
+      price: 2899,
+      originalPrice: 3599,
+      emoji: '💍',
+      tag: 'HOT',
+      karatInfo: 'Uncut Polki Foil',
+      grossWeight: '22.4 g',
+      netWeight: '18.1 g',
+      metalType: 'Copper & Silver Alloy',
+      stoneType: 'Uncut Polki & Onyx',
+      size: '5.5 in Length',
+      closure: 'Anchor Hook',
+      hallmark: 'Artisan Certified',
+      description: 'Floral bridal maangtikka with hanging dark green onyx bead drops.',
+    ),
   ];
 
   final List<CartItem> cart = [];
@@ -88,7 +188,7 @@ class AppState extends ChangeNotifier {
   final List<Product> wishlist = [];
   final List<OrderItem> orders = [
     OrderItem(orderId: 'RGORD123456', productName: 'Kundan Choker Necklace', emoji: '👑', amount: 3499, status: 'Order Confirmed', date: '28 May'),
-    OrderItem(orderId: 'RGTR123456', productName: 'Trial Box (3 Pieces)', emoji: '👑', amount: 99, status: 'Trial Scheduled', date: '27 May', isTrial: true),
+    OrderItem(orderId: 'RGTR123456', productName: 'Trial Box (3 Pieces)', emoji: '👑', amount: 99, status: 'Trial Scheduled (27 May)', date: '27 May', isTrial: true),
   ];
 
   double scrapCashback = 0.0;
@@ -96,13 +196,30 @@ class AppState extends ChangeNotifier {
   String selectedSlot = 'Evening (04:00 PM - 07:00 PM)';
   final int trialFee = 99;
 
-  void completeOnboarding() { isFirstTimeUser = false; notifyListeners(); }
-  void login(String phone, String name) { userPhone = phone; userName = name; isLoggedIn = true; notifyListeners(); }
-  void logout() { isLoggedIn = false; notifyListeners(); }
+  void completeOnboarding() {
+    isFirstTimeUser = false;
+    notifyListeners();
+  }
+
+  void login(String phone, String name) {
+    userPhone = phone;
+    userName = name;
+    isLoggedIn = true;
+    notifyListeners();
+  }
+
+  void logout() {
+    isLoggedIn = false;
+    notifyListeners();
+  }
 
   void addToCart(Product p, {double? customPrice}) {
     final idx = cart.indexWhere((i) => i.product.id == p.id);
-    if (idx >= 0) { cart[idx].quantity++; } else { cart.add(CartItem(product: p, customPrice: customPrice)); }
+    if (idx >= 0) {
+      cart[idx].quantity++;
+    } else {
+      cart.add(CartItem(product: p, customPrice: customPrice));
+    }
     notifyListeners();
   }
 
@@ -119,20 +236,43 @@ class AppState extends ChangeNotifier {
   double get finalPayable => (cartSubtotal - scrapCashback).clamp(0, double.infinity);
 
   void toggleWishlist(Product p) {
-    if (wishlist.any((i) => i.id == p.id)) { wishlist.removeWhere((i) => i.id == p.id); } else { wishlist.add(p); }
+    if (wishlist.any((i) => i.id == p.id)) {
+      wishlist.removeWhere((i) => i.id == p.id);
+    } else {
+      wishlist.add(p);
+    }
     notifyListeners();
   }
 
   bool isWishlisted(String id) => wishlist.any((i) => i.id == id);
 
   void addToTrialKit(Product p) {
-    if (trialKit.length < 4 && !trialKit.any((i) => i.id == p.id)) { trialKit.add(p); notifyListeners(); }
+    if (trialKit.length < 4 && !trialKit.any((i) => i.id == p.id)) {
+      trialKit.add(p);
+      notifyListeners();
+    }
   }
 
-  void removeFromTrialKit(String id) { trialKit.removeWhere((i) => i.id == id); notifyListeners(); }
-  void setSlot(String date, String slot) { selectedDate = date; selectedSlot = slot; notifyListeners(); }
-  void applyScrapCashback(double amt) { scrapCashback = amt; notifyListeners(); }
-  void removeScrapCashback() { scrapCashback = 0.0; notifyListeners(); }
+  void removeFromTrialKit(String id) {
+    trialKit.removeWhere((i) => i.id == id);
+    notifyListeners();
+  }
+
+  void setSlot(String date, String slot) {
+    selectedDate = date;
+    selectedSlot = slot;
+    notifyListeners();
+  }
+
+  void applyScrapCashback(double amt) {
+    scrapCashback = amt;
+    notifyListeners();
+  }
+
+  void removeScrapCashback() {
+    scrapCashback = 0.0;
+    notifyListeners();
+  }
 
   void placeOrder({required bool isTrial}) {
     final id = isTrial ? 'RGTR123456' : 'RGORD123456';
@@ -140,14 +280,20 @@ class AppState extends ChangeNotifier {
     final emoji = isTrial ? '👑' : (cart.isNotEmpty ? cart.first.product.emoji : '💎');
     final amount = isTrial ? trialFee.toDouble() : finalPayable;
 
-    orders.insert(0, OrderItem(orderId: id, productName: name, emoji: emoji, amount: amount, status: 'Order Confirmed', date: 'Today', isTrial: isTrial));
-    if (!isTrial) { cart.clear(); scrapCashback = 0.0; }
+    orders.insert(
+      0,
+      OrderItem(orderId: id, productName: name, emoji: emoji, amount: amount, status: 'Order Confirmed', date: 'Today', isTrial: isTrial),
+    );
+    if (!isTrial) {
+      cart.clear();
+      scrapCashback = 0.0;
+    }
     notifyListeners();
   }
 }
 
 // ==========================================
-// 🚀 APP ENTRY & NAVIGATION SHELL
+// 🚀 APP ENTRY
 // ==========================================
 void main() {
   runApp(
@@ -194,6 +340,9 @@ class RootDecider extends StatelessWidget {
   }
 }
 
+// ==========================================
+// 🧭 MAIN NAVIGATION SHELL (5 TABS)
+// ==========================================
 class MainNavShell extends StatefulWidget {
   final int initialIndex;
   const MainNavShell({super.key, this.initialIndex = 0});
@@ -251,7 +400,7 @@ class _MainNavShellState extends State<MainNavShell> {
 }
 
 // ==========================================
-// 📱 01–06: ONBOARDING & AUTHENTICATION
+// 📱 01–06: ONBOARDING & AUTH
 // ==========================================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -330,12 +479,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (i) => Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: _page == i ? 22 : 6,
-                height: 6,
-                decoration: BoxDecoration(color: _page == i ? AppColors.gold : Colors.white24, borderRadius: BorderRadius.circular(3)),
-              )),
+              children: List.generate(
+                3,
+                (i) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _page == i ? 22 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(color: _page == i ? AppColors.gold : Colors.white24, borderRadius: BorderRadius.circular(3)),
+                ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(24),
@@ -362,57 +514,63 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   Widget _slide1() => Padding(
-    padding: const EdgeInsets.all(24),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text('✨', style: TextStyle(fontSize: 72)),
-        const SizedBox(height: 24),
-        Text('For Every You,\nFor Every Moment.', textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory)),
-        const SizedBox(height: 10),
-        const Text('From everyday elegance to dreamy bridal looks.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppColors.goldLight)),
-      ],
-    ),
-  );
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('✨', style: TextStyle(fontSize: 72)),
+            const SizedBox(height: 24),
+            Text('For Every You,\nFor Every Moment.', textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory)),
+            const SizedBox(height: 10),
+            const Text('From everyday elegance to dreamy bridal looks.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppColors.goldLight)),
+          ],
+        ),
+      );
 
   Widget _slide2() => Padding(
-    padding: const EdgeInsets.all(24),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _featCard('👑', 'Try at Home', 'Book 3-4 pieces and try at home for 20-30 mins.'),
-        _featCard('♻️', 'Exchange & Save', 'Exchange old jewellery for instant cashback.'),
-        _featCard('🛡️', 'Trusted Quality', 'Premium imitation finish with 6 months warranty.'),
-      ],
-    ),
-  );
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _featCard('👑', 'Try at Home', 'Book 3-4 pieces and try at home for 20-30 mins.'),
+            _featCard('♻️', 'Exchange & Save', 'Exchange old jewellery for instant cashback.'),
+            _featCard('🛡️', 'Trusted Quality', 'Premium imitation finish with 6 months warranty.'),
+          ],
+        ),
+      );
 
   Widget _featCard(String e, String t, String d) => Card(
-    color: AppColors.wineCard,
-    margin: const EdgeInsets.only(bottom: 10),
-    child: ListTile(
-      leading: Text(e, style: const TextStyle(fontSize: 24)),
-      title: Text(t, style: const TextStyle(color: AppColors.goldLight, fontWeight: FontWeight.bold, fontSize: 13)),
-      subtitle: Text(d, style: const TextStyle(color: AppColors.ivory, fontSize: 11)),
-    ),
-  );
+        color: AppColors.wineCard,
+        margin: const EdgeInsets.only(bottom: 10),
+        child: ListTile(
+          leading: Text(e, style: const TextStyle(fontSize: 24)),
+          title: Text(t, style: const TextStyle(color: AppColors.goldLight, fontWeight: FontWeight.bold, fontSize: 13)),
+          subtitle: Text(d, style: const TextStyle(color: AppColors.ivory, fontSize: 11)),
+        ),
+      );
 
   Widget _slide3() => Padding(
-    padding: const EdgeInsets.all(24),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Her Choice.\nOur Promise.', textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory)),
-        const SizedBox(height: 20),
-        ...['1 Lakh+ Happy Customers', '100% Secure Payments', 'Easy Returns', 'Pan India Delivery'].map(
-          (t) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(children: [const Icon(Icons.check_circle, color: AppColors.gold, size: 16), const SizedBox(width: 8), Text(t, style: const TextStyle(color: AppColors.ivory, fontSize: 12))]),
-          ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Her Choice.\nOur Promise.', textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory)),
+            const SizedBox(height: 20),
+            ...['1 Lakh+ Happy Customers', '100% Secure Payments', 'Easy Returns', 'Pan India Delivery'].map(
+              (t) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: AppColors.gold, size: 16),
+                    const SizedBox(width: 8),
+                    Text(t, style: const TextStyle(color: AppColors.ivory, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
 
 class AuthPhoneScreen extends StatelessWidget {
@@ -487,7 +645,8 @@ class OtpVerifyScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: ['2', '4', '6', '8', '1', '1'].map((d) => Container(
-                width: 40, height: 44,
+                width: 40,
+                height: 44,
                 decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppColors.gold)),
                 alignment: Alignment.Center,
                 child: Text(d, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -517,7 +676,7 @@ class OtpVerifyScreen extends StatelessWidget {
 }
 
 // ==========================================
-// 🏠 07–10: HOME, CATALOG & PRODUCT DETAILS
+// 🏠 07–10: HOME, CATALOG & PDP
 // ==========================================
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -553,10 +712,9 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Trial @Home Banner
             Card(
               color: AppColors.cardBg,
-              shape: RoundedCornerShape(12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(14),
                 child: Row(
@@ -582,8 +740,6 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Categories Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -595,8 +751,6 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 20),
-
-            // Best Sellers Grid
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -604,7 +758,6 @@ class HomeScreen extends StatelessWidget {
                 TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CategoriesScreen())), child: const Text('See All', style: TextStyle(color: AppColors.goldDark, fontSize: 12))),
               ],
             ),
-
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -665,11 +818,16 @@ class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
   final List<Map<String, String>> categories = const [
-    {'title': 'Daily Wear', 'icon': '💫'}, {'title': 'Korean', 'icon': '✨'},
-    {'title': 'Temple', 'icon': '🪔'}, {'title': 'Bridal', 'icon': '👑'},
-    {'title': 'Necklaces', 'icon': '📿'}, {'title': 'Earrings', 'icon': '💎'},
-    {'title': 'Bangles', 'icon': '⭕'}, {'title': 'Rings', 'icon': '💍'},
-    {'title': 'Mangalsutra', 'icon': '🖤'}, {'title': 'Sets', 'icon': '🎁'},
+    {'title': 'Daily Wear', 'icon': '💫'},
+    {'title': 'Korean', 'icon': '✨'},
+    {'title': 'Temple', 'icon': '🪔'},
+    {'title': 'Bridal', 'icon': '👑'},
+    {'title': 'Necklaces', 'icon': '📿'},
+    {'title': 'Earrings', 'icon': '💎'},
+    {'title': 'Bangles', 'icon': '⭕'},
+    {'title': 'Rings', 'icon': '💍'},
+    {'title': 'Mangalsutra', 'icon': '🖤'},
+    {'title': 'Sets', 'icon': '🎁'},
   ];
 
   @override
@@ -828,6 +986,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             const SizedBox(height: 12),
             Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    _spec('Metal Alloy', p.metalType),
+                    _spec('Plating / Karat', p.karatInfo),
+                    _spec('Gross Weight', p.grossWeight),
+                    _spec('Net Weight', p.netWeight),
+                    _spec('Stone Type', p.stoneType),
+                    _spec('Closure', p.closure),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
               child: ListTile(
                 leading: const Text('💬', style: TextStyle(fontSize: 20)),
                 title: const Text('Chat & Bargain with Jeweller', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
@@ -840,6 +1014,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
+
+  Widget _spec(String k, String v) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(k, style: const TextStyle(fontSize: 11, color: AppColors.textMuted)),
+          Text(v, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+        ]),
+      );
 
   void _bargainDialog(BuildContext context, Product p) {
     final ctrl = TextEditingController(text: '${(p.price * 0.9).toInt()}');
@@ -988,21 +1170,23 @@ class TrialCartScreen extends StatelessWidget {
               const Center(child: Text('No items in trial kit'))
             else
               ...state.trialKit.map((p) => Card(
-                child: ListTile(
-                  leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
-                  title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                  trailing: IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 18), onPressed: () => state.removeFromTrialKit(p.id)),
-                ),
-              )),
+                    child: ListTile(
+                      leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
+                      title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                      trailing: IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 18), onPressed: () => state.removeFromTrialKit(p.id)),
+                    ),
+                  )),
             const Spacer(),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
-                onPressed: state.trialKit.isEmpty ? null : () {
-                  state.placeOrder(isTrial: true);
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TrialConfirmedScreen()));
-                },
+                onPressed: state.trialKit.isEmpty
+                    ? null
+                    : () {
+                        state.placeOrder(isTrial: true);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TrialConfirmedScreen()));
+                      },
                 child: const Text('Confirm Trial Booking · Pay ₹99'),
               ),
             ),
@@ -1178,310 +1362,24 @@ class CartScreen extends StatelessWidget {
               child: Column(
                 children: [
                   ...state.cart.map((item) => Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        children: [
-                          Text(item.product.emoji, style: const TextStyle(fontSize: 28)),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                                Text('₹${item.unitPrice.toInt()}'),
-                              ],
-                            ),
-                          ),
-                          Row(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
                             children: [
-                              IconButton(icon: const Icon(Icons.remove, size: 16), onPressed: () => state.updateCartQty(item.product.id, -1)),
-                              Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                              IconButton(icon: const Icon(Icons.add, size: 16), onPressed: () => state.updateCartQty(item.product.id, 1)),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  )),
-                  const SizedBox(height: 10),
-                  Card(
-                    color: state.scrapCashback > 0 ? AppColors.emeraldLight : AppColors.cardBg,
-                    child: ListTile(
-                      title: Text(
-                        state.scrapCashback > 0 ? 'Scrap Cashback: -₹${state.scrapCashback.toInt()}' : 'Have old jewellery to exchange?',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: state.scrapCashback > 0 ? AppColors.emerald : AppColors.textDark),
-                      ),
-                      trailing: state.scrapCashback > 0
-                          ? IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 16), onPressed: () => state.removeScrapCashback())
-                          : const Icon(Icons.arrow_forward_ios, size: 12),
-                      onTap: () => state.scrapCashback == 0 ? Navigator.push(context, MaterialPageRoute(builder: (_) => const ExchangeHomeScreen())) : null,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        children: [
-                          _bRow('Subtotal', '₹${state.cartSubtotal.toInt()}'),
-                          if (state.scrapCashback > 0) _bRow('Scrap Cashback', '- ₹${state.scrapCashback.toInt()}', isGreen: true),
-                          const Divider(),
-                          _bRow('Total Payable', '₹${state.finalPayable.toInt()}', isBold: true),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
-                      child: Text('Proceed to Checkout · ₹${state.finalPayable.toInt()}'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-    );
-  }
-
-  Widget _bRow(String k, String v, {bool isGreen = false, bool isBold = false}) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 2),
-    child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(k, style: TextStyle(fontSize: 11, color: isGreen ? AppColors.emerald : AppColors.textDark, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
-      Text(v, style: TextStyle(fontSize: 11, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: isGreen ? AppColors.emerald : AppColors.winePrimary)),
-    ]),
-  );
-}
-
-class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({super.key});
-
-  @override
-  State<CheckoutScreen> createState() => _CheckoutScreenState();
-}
-
-class _CheckoutScreenState extends State<CheckoutScreen> {
-  String _pay = 'UPI - Google Pay';
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Checkout')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Delivery Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-            const Card(child: ListTile(title: Text('21-1-564, Lakdi Ka Pul, Hyderabad...', style: TextStyle(fontSize: 11)))),
-            const SizedBox(height: 14),
-            const Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-            ...['UPI - Google Pay', 'Credit / Debit Card', 'Cash on Delivery'].map(
-              (p) => Card(
-                child: RadioListTile<String>(
-                  value: p,
-                  groupValue: _pay,
-                  onChanged: (v) => setState(() => _pay = v!),
-                  title: Text(p, style: const TextStyle(fontSize: 11)),
-                ),
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
-                onPressed: () {
-                  state.placeOrder(isTrial: false);
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OrderSuccessScreen()));
-                },
-                child: Text('Pay ₹${state.finalPayable.toInt()} & Place Order'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class OrderSuccessScreen extends StatelessWidget {
-  const OrderSuccessScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.wineDark,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.check_circle, color: AppColors.gold, size: 60),
-              const SizedBox(height: 16),
-              const Text('Order Confirmed!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.ivory)),
-              const SizedBox(height: 6),
-              const Text('Order ID: RGORD123456', style: TextStyle(color: AppColors.goldLight, fontSize: 12)),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
-                onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OrderTrackingScreen())),
-                child: const Text('Track Order'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class OrderTrackingScreen extends StatelessWidget {
-  const OrderTrackingScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Track Order')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Card(
-              child: ListTile(
-                title: Text('RGORD123456', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                subtitle: Text('Delivery Partner: Vikram (Express Hub)'),
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('• Order Confirmed - 28 May', style: TextStyle(fontSize: 11)),
-                    SizedBox(height: 6),
-                    Text('• Packed at Hub - 28 May', style: TextStyle(fontSize: 11)),
-                    SizedBox(height: 6),
-                    Text('• Out for Delivery - Today', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald)),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ==========================================
-// 👤 28–30: PROFILE, WISHLIST & SUPPORT
-// ==========================================
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('My Account')),
-      body: ListView(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: AppColors.cardBg,
-            child: Row(
-              children: [
-                const CircleAvatar(radius: 22, backgroundColor: AppColors.goldLight, child: Text('MS', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.wineDark))),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(state.userName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                    Text(state.userPhone, style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          ListTile(leading: const Icon(Icons.inventory_2_outlined, size: 20), title: const Text('My Orders', style: TextStyle(fontSize: 12)), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderTrackingScreen()))),
-          ListTile(leading: const Icon(Icons.favorite_border, size: 20), title: const Text('Wishlist', style: TextStyle(fontSize: 12)), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WishlistScreen()))),
-          ListTile(leading: const Icon(Icons.headset_mic_outlined, size: 20), title: const Text('Help & Support', style: TextStyle(fontSize: 12)), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()))),
-          ListTile(
-            leading: const Icon(Icons.logout, color: AppColors.ruby, size: 20),
-            title: const Text('Logout', style: TextStyle(color: AppColors.ruby, fontWeight: FontWeight.bold, fontSize: 12)),
-            onTap: () {
-              state.logout();
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const AuthPhoneScreen()), (r) => false);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class WishlistScreen extends StatelessWidget {
-  const WishlistScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
-    return Scaffold(
-      appBar: AppBar(title: Text('Wishlist (${state.wishlist.length})')),
-      body: state.wishlist.isEmpty
-          ? const Center(child: Text('Wishlist is empty'))
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: state.wishlist.length,
-              itemBuilder: (context, i) {
-                final p = state.wishlist[i];
-                return Card(
-                  child: ListTile(
-                    leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
-                    title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                    subtitle: Text('₹${p.price.toInt()}'),
-                    trailing: ElevatedButton(
-                      onPressed: () {
-                        state.addToCart(p);
-                        state.toggleWishlist(p);
-                      },
-                      child: const Text('Move to Cart', style: TextStyle(fontSize: 9)),
-                    ),
-                  ),
-                );
-              },
-            ),
-    );
-  }
-}
-
-class SupportScreen extends StatelessWidget {
-  const SupportScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Help & Support')),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          Text('How can we help you?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Card(child: ListTile(leading: Icon(Icons.chat, size: 18), title: Text('Chat with Concierge', style: TextStyle(fontSize: 11)), subtitle: Text('WhatsApp Support (9 AM - 9 PM)', style: TextStyle(fontSize: 10)))),
-          Card(child: ListTile(leading: Icon(Icons.phone, size: 18), title: Text('Call Support', style: TextStyle(fontSize: 11)), subtitle: Text('+91 1800 200 9999 (Toll Free)', style: TextStyle(fontSize: 10)))),
-        ],
-      ),
-    );
-  }
-}
+                              Text(item.product.emoji, style: const TextStyle(fontSize: 28)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                                    Text('₹${item.unitPrice.toInt()}'),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(icon: const Icon(Icons.remove, size: 16), onPressed: () => state.updateCartQty(item.product.id, -1)),
+                                  Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  IconButton(icon: const Icon(Icons.add, size: 16), onPressed: () => state.updateCartQty(item.product.id, 1)),
+                                ],

@@ -1068,12 +1068,12 @@ class TryAtHomeInfoScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            const Card(
+            Card(
               child: Padding(
-                padding: EdgeInsets.all(14),
+                padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     Text('How it works?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     SizedBox(height: 8),
                     Text('1. Book up to 4 pieces.\n2. We deliver to your doorstep.\n3. Try for 20-30 mins.\n4. Buy what you love, return the rest.', style: TextStyle(fontSize: 11, height: 1.5)),
@@ -1082,10 +1082,10 @@ class TryAtHomeInfoScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Card(
+            Card(
               child: ListTile(
-                title: Text('Trial Fee (Nominal)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                subtitle: Text('₹99 per slot (Adjustable on purchase)', style: TextStyle(fontSize: 10)),
+                title: const Text('Trial Fee (Nominal)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                subtitle: const Text('₹99 per slot (Adjustable on purchase)', style: TextStyle(fontSize: 10)),
               ),
             ),
             const Spacer(),
@@ -1283,11 +1283,11 @@ class _ExchangeHomeScreenState extends State<ExchangeHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Card(
+            Card(
               color: AppColors.emeraldLight,
               child: Padding(
-                padding: EdgeInsets.all(12),
-                child: Text('♻️ Trade in old jewellery for instant cashback applied directly to your cart bill.', style: TextStyle(fontSize: 11, color: AppColors.emerald, height: 1.4)),
+                padding: const EdgeInsets.all(12),
+                child: const Text('♻️ Trade in old jewellery for instant cashback applied directly to your cart bill.', style: TextStyle(fontSize: 11, color: AppColors.emerald, height: 1.4)),
               ),
             ),
             const SizedBox(height: 14),
@@ -1383,3 +1383,305 @@ class CartScreen extends StatelessWidget {
                                   Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
                                   IconButton(icon: const Icon(Icons.add, size: 16), onPressed: () => state.updateCartQty(item.product.id, 1)),
                                 ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                  const SizedBox(height: 10),
+                  Card(
+                    color: state.scrapCashback > 0 ? AppColors.emeraldLight : AppColors.cardBg,
+                    child: ListTile(
+                      title: Text(
+                        state.scrapCashback > 0 ? 'Scrap Cashback: -₹${state.scrapCashback.toInt()}' : 'Have old jewellery to exchange?',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: state.scrapCashback > 0 ? AppColors.emerald : AppColors.textDark),
+                      ),
+                      trailing: state.scrapCashback > 0
+                          ? IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 16), onPressed: () => state.removeScrapCashback())
+                          : const Icon(Icons.arrow_forward_ios, size: 12),
+                      onTap: () => state.scrapCashback == 0 ? Navigator.push(context, MaterialPageRoute(builder: (_) => const ExchangeHomeScreen())) : null,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          _bRow('Subtotal', '₹${state.cartSubtotal.toInt()}'),
+                          if (state.scrapCashback > 0) _bRow('Scrap Cashback', '- ₹${state.scrapCashback.toInt()}', isGreen: true),
+                          const Divider(),
+                          _bRow('Total Payable', '₹${state.finalPayable.toInt()}', isBold: true),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
+                      child: Text('Proceed to Checkout · ₹${state.finalPayable.toInt()}'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _bRow(String k, String v, {bool isGreen = false, bool isBold = false}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(k, style: TextStyle(fontSize: 11, color: isGreen ? AppColors.emerald : AppColors.textDark, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(v, style: TextStyle(fontSize: 11, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: isGreen ? AppColors.emerald : AppColors.winePrimary)),
+        ]),
+      );
+}
+
+class CheckoutScreen extends StatefulWidget {
+  const CheckoutScreen({super.key});
+
+  @override
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
+
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  String _pay = 'UPI - Google Pay';
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Checkout')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Delivery Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            Card(
+              child: ListTile(
+                title: const Text('21-1-564, Lakdi Ka Pul, Hyderabad...', style: TextStyle(fontSize: 11)),
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ...['UPI - Google Pay', 'Credit / Debit Card', 'Cash on Delivery'].map(
+              (p) => Card(
+                child: RadioListTile<String>(
+                  value: p,
+                  groupValue: _pay,
+                  onChanged: (v) => setState(() => _pay = v!),
+                  title: Text(p, style: const TextStyle(fontSize: 11)),
+                ),
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
+                onPressed: () {
+                  state.placeOrder(isTrial: false);
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OrderSuccessScreen()));
+                },
+                child: Text('Pay ₹${state.finalPayable.toInt()} & Place Order'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class OrderSuccessScreen extends StatelessWidget {
+  const OrderSuccessScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.wineDark,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.check_circle, color: AppColors.gold, size: 60),
+              const SizedBox(height: 16),
+              const Text('Order Confirmed!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.ivory)),
+              const SizedBox(height: 6),
+              const Text('Order ID: RGORD123456', style: TextStyle(color: AppColors.goldLight, fontSize: 12)),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
+                onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const OrderTrackingScreen())),
+                child: const Text('Track Order'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OrderTrackingScreen extends StatelessWidget {
+  const OrderTrackingScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Track Order')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Card(
+              child: ListTile(
+                title: const Text('RGORD123456', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                subtitle: const Text('Delivery Partner: Vikram (Express Hub)'),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text('• Order Confirmed - 28 May', style: TextStyle(fontSize: 11)),
+                    SizedBox(height: 6),
+                    Text('• Packed at Hub - 28 May', style: TextStyle(fontSize: 11)),
+                    SizedBox(height: 6),
+                    Text('• Out for Delivery - Today', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.emerald)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 👤 28–30: PROFILE, WISHLIST & SUPPORT
+// ==========================================
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('My Account')),
+      body: ListView(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: AppColors.cardBg,
+            child: Row(
+              children: [
+                const CircleAvatar(radius: 22, backgroundColor: AppColors.goldLight, child: Text('MS', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.wineDark))),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(state.userName, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    Text(state.userPhone, style: const TextStyle(fontSize: 10, color: AppColors.textMuted)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          ListTile(leading: const Icon(Icons.inventory_2_outlined, size: 20), title: const Text('My Orders', style: TextStyle(fontSize: 12)), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderTrackingScreen()))),
+          ListTile(leading: const Icon(Icons.favorite_border, size: 20), title: const Text('Wishlist', style: TextStyle(fontSize: 12)), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WishlistScreen()))),
+          ListTile(leading: const Icon(Icons.headset_mic_outlined, size: 20), title: const Text('Help & Support', style: TextStyle(fontSize: 12)), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SupportScreen()))),
+          ListTile(
+            leading: const Icon(Icons.logout, color: AppColors.ruby, size: 20),
+            title: const Text('Logout', style: TextStyle(color: AppColors.ruby, fontWeight: FontWeight.bold, fontSize: 12)),
+            onTap: () {
+              state.logout();
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const AuthPhoneScreen()), (r) => false);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class WishlistScreen extends StatelessWidget {
+  const WishlistScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Wishlist (${state.wishlist.length})')),
+      body: state.wishlist.isEmpty
+          ? const Center(child: Text('Wishlist is empty'))
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: state.wishlist.length,
+              itemBuilder: (context, i) {
+                final p = state.wishlist[i];
+                return Card(
+                  child: ListTile(
+                    leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
+                    title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                    subtitle: Text('₹${p.price.toInt()}'),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        state.addToCart(p);
+                        state.toggleWishlist(p);
+                      },
+                      child: const Text('Move to Cart', style: TextStyle(fontSize: 9)),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
+
+class SupportScreen extends StatelessWidget {
+  const SupportScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Help & Support')),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const Text('How can we help you?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.chat, size: 18),
+              title: const Text('Chat with Concierge', style: TextStyle(fontSize: 11)),
+              subtitle: const Text('WhatsApp Support (9 AM - 9 PM)', style: TextStyle(fontSize: 10)),
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.phone, size: 18),
+              title: const Text('Call Support', style: TextStyle(fontSize: 11)),
+              subtitle: const Text('+91 1800 200 9999 (Toll Free)', style: TextStyle(fontSize: 10)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

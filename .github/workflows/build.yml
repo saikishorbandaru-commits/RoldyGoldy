@@ -23,18 +23,22 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Prepare Clean Android Project
+      - name: Prepare Clean Flutter Android Project
         run: |
           rm -rf android app build .dart_tool build.gradle.kts settings.gradle.kts gradle.properties
           mkdir -p assets/images
           flutter create --platforms=android --org com.roldygoldy --project-name roldygoldy_ui .
-          flutter config --no-analytics
-          yes | flutter doctor --android-licenses || true
           flutter pub get
+          flutter analyze || true
 
-      - name: Build Debug APK
+      - name: Build APK
         run: flutter build apk --debug
 
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: RoldyGoldy-Flutter-APK
+          path: build/app/outputs/flutter-apk/app-debug.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

@@ -23,11 +23,12 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Clean and Generate Android Scaffold
+      - name: Prepare Clean Android Project
         run: |
           rm -rf android app build .dart_tool build.gradle.kts settings.gradle.kts gradle.properties
           mkdir -p assets/images
           flutter create --platforms=android --org com.roldygoldy --project-name roldygoldy_ui .
+          chmod +x android/gradlew || true
           flutter pub get
 
       - name: Build Debug APK

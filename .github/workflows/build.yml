@@ -1,4 +1,4 @@
-name: Build Flutter APK
+name: Build Android APK
 
 on:
   push:
@@ -12,29 +12,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
+          distribution: 'temurin'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
         with:
-          channel: 'stable'
+          gradle-version: '8.7'
 
-      - name: Build Application APK
-        run: |
-          flutter create --org com.roldygoldy roldygoldy_app
-          cp lib/main.dart roldygoldy_app/lib/main.dart
-          cd roldygoldy_app
-          flutter build apk --debug
-          cd ..
-          mkdir -p build/app/outputs/flutter-apk
-          cp roldygoldy_app/build/app/outputs/flutter-apk/app-debug.apk build/app/outputs/flutter-apk/app-debug.apk
+      - name: Build Debug APK
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RoldyGoldy-Flutter-APK
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: RoldyGoldy-APK
+          path: app/build/outputs/apk/debug/app-debug.apk

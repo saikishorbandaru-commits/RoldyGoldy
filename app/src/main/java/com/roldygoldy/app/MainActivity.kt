@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,6 +44,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -70,7 +73,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.max
 
 // ==========================================
-// 🎨 EXACT LUXURY PALETTE (From App Flow Diagram)
+// 🎨 COMPLETE PALETTE & STYLING
 // ==========================================
 val DarkCanvas = Color(0xFF120C07)
 val DarkCard = Color(0xFF1C130D)
@@ -84,8 +87,12 @@ val LightBorder = Color(0xFFEFE8DC)
 val TextDark = Color(0xFF1F1610)
 val TextMuted = Color(0xFF8C7E72)
 val EmeraldSuccess = Color(0xFF1B6B46)
-val EmeraldLight = Color(0xFFE2F4EB)
+val EmeraldSoft = Color(0xFFE2F4EB)
 val RubyRed = Color(0xFFA62435)
+val WineVelvet = Color(0xFF4A0A28)
+val WineRich = Color(0xFF6B1139)
+val IvorySilky = Color(0xFFFAF6EE)
+val GlassBorder = Color(0x33D4AF37)
 
 val DarkObsidianGrad = Brush.verticalGradient(listOf(DarkSurface, DarkCard, DarkCanvas))
 
@@ -100,7 +107,7 @@ fun RoldyGoldyLogo(size: Int = 38, showSubtitle: Boolean = false, isDarkBg: Bool
 }
 
 // ==========================================
-// 📦 DATA MODELS
+// 📦 DATA MODELS & PRODUCT LIST
 // ==========================================
 data class Product(
     val id: String, val name: String, val category: String, val price: Double, val originalPrice: Double,
@@ -114,11 +121,19 @@ data class Address(val id: String, val label: String, val recipientName: String,
 data class ChatMessage(val id: String, val senderId: String, val text: String, val timestamp: String, val isOffer: Boolean = false, val counterAmount: Double? = null)
 data class OrderHistoryItem(val orderId: String, val productName: String, val emoji: String, val amount: Double, val status: String, val date: String, val isTrial: Boolean)
 data class ExchangeSlip(val id: String, val materialCategory: String, val itemName: String, val weightGrams: Double, val grossValue: Double, val netCredit: Double, val otp: String = "ROEX123456", val date: String, val photoBitmap: Bitmap? = null)
+data class OnboardingSlide(val title: String, val subtitle: String, val emoji: String, val badge: String)
+
+val onboardingSlides = listOf(
+    OnboardingSlide("3D Virtual Try-On", "Live AR camera tryout for necklaces, hoops & maangtikkas directly on your selfie camera.", "🪞", "Virtual Mirror"),
+    OnboardingSlide("Trial @Home Concierge", "Try real pieces at your doorstep for 15–20 minutes with our insured trial kit.", "👑", "Doorstep Tryout"),
+    OnboardingSlide("Old Jewellery Exchange", "Trade in old rolled-gold or broken items for ₹0.30–₹0.35/g credit deducted straight from your cart bill.", "♻️", "Trade-In Discount"),
+    OnboardingSlide("Live Jeweller Bargaining", "Chat directly with master artisans, send custom offers, and lock handcrafted discount deals in real time.", "💬", "P2P Negotiation")
+)
 
 val sampleProducts = listOf(
-    Product("1", "Kundan Choker Necklace", "Bridal", 3499.0, 4899.0, "👑", true, "HOT", "1-Gram Matte Gold Plated", "48.5 g", "36.2 g", "Brass & Copper Alloy", "Kundan & Hydro Emeralds", "Adjustable 12–18 in", "Golden Zari Dori", "RG 1-Gram Certified", "Royal bridal choker set handcrafted with precision Kundan foil work."),
+    Product("1", "Kundan Choker Necklace", "Bridal", 3499.0, 4899.0, "👑", true, "HOT", "1-Gram Matte Gold Plated", "48.5 g", "36.2 g", "Brass & Copper Alloy", "Kundan & Hydro Emeralds", "12–18 in", "Golden Zari Dori", "RG 1-Gram Certified", "Royal bridal choker set handcrafted with precision Kundan foil work."),
     Product("2", "Korean Minimal Hoops", "Daily Wear", 349.0, 549.0, "💫", false, "NEW", "18K PVD Anti-Tarnish", "6.8 g", "6.8 g", "316L Surgical Titanium", "AAA+ Cubic Zirconia", "18mm Diameter", "Click-top Security Latch", "18K PVD Certified", "Waterproof and hypoallergenic daily-wear hoops."),
-    Product("3", "Temple Deity Jhumka Set", "Temple", 1299.0, 1899.0, "🪔", true, "BESTSELLER", "Antique Micro-Gold Plated", "38.2 g", "30.5 g", "Bronze Alloy", "Kemp Stones & Pearls", "Adjustable 14–16 in", "Metallic Lobster Lock", "Micro-Gold Guaranteed Finish", "South Indian temple motif with ruby-red kemp stones."),
+    Product("3", "Temple Deity Jhumka Set", "Temple", 1299.0, 1899.0, "🪔", true, "BESTSELLER", "Antique Micro-Gold Plated", "38.2 g", "30.5 g", "Bronze Alloy", "Kemp Stones & Pearls", "14–16 in", "Metallic Lobster Lock", "Micro-Gold Guaranteed Finish", "South Indian temple motif with ruby-red kemp stones."),
     Product("4", "Polki Bridal Maangtikka", "Bridal", 2899.0, 3599.0, "💍", true, "HOT", "Uncut Polki Foil Finish", "22.4 g", "18.1 g", "Copper & Silver Alloy", "Uncut Polki & Onyx Drops", "5.5 in Length", "Curved Hairpin Anchor Hook", "Artisan Certified", "Floral bridal maangtikka with silver foil polki setting.")
 )
 
@@ -128,7 +143,7 @@ val sampleAddresses = listOf(
 )
 
 // ==========================================
-// 🧠 VIEWMODEL & STATE
+// 🧠 VIEWMODEL & APP STATE
 // ==========================================
 data class AppState(
     val isFirstTimeUser: Boolean = true,
@@ -176,6 +191,11 @@ class MainViewModel : ViewModel() {
     fun setVtoProduct(p: Product) { _state.update { it.copy(activeVtoProduct = p) } }
     fun selectAddress(address: Address) { _state.update { it.copy(selectedAddress = address) } }
     fun setSlot(date: String, slot: String) { _state.update { it.copy(selectedDate = date, selectedSlot = slot) } }
+
+    fun autoDetectGps() {
+        val detected = Address("gps", "Current Location (Live GPS)", _state.value.userFullName, "Lakdi Ka Pul, Hyderabad", "500001", 1.8, isDefault = true)
+        _state.update { it.copy(addresses = listOf(detected) + it.addresses, selectedAddress = detected) }
+    }
 
     fun toggleWishlist(product: Product) {
         val current = _state.value.wishlist.toMutableList()
@@ -298,7 +318,7 @@ class MainViewModel : ViewModel() {
 }
 
 // ==========================================
-// 🚀 NAVIGATION ROUTER & APP SHELL
+// 🚀 NAVIGATION ROUTER
 // ==========================================
 sealed class Screen(val route: String, val title: String) {
     data object Splash : Screen("splash", "Splash")
@@ -330,6 +350,7 @@ sealed class Screen(val route: String, val title: String) {
     data object HelpSupport : Screen("help_support", "Help & Support")
     data object VirtualTryOn : Screen("vto", "3D Mirror")
     data object SellerChat : Screen("chat/{productId}", "Chat") { fun create(pId: String) = "chat/$pId" }
+    data object AddressBook : Screen("address_book", "Addresses")
 }
 
 class MainActivity : ComponentActivity() {
@@ -433,10 +454,11 @@ fun AppNavigator(vm: MainViewModel = viewModel()) {
             composable(Screen.OrderTracking.route) { OrderTrackingScreen(vm) { navController.popBackStack() } }
             composable(Screen.TrialExperienceLive.route) { TrialExperienceLiveScreen({ navController.navigate(Screen.Cart.route) }, { navController.navigate(Screen.ReturnsAfterTrial.route) }) }
             composable(Screen.ReturnsAfterTrial.route) { ReturnsAfterTrialScreen(vm, { navController.popBackStack() }, { navController.navigate(Screen.Home.route) }) }
-            composable(Screen.Profile.route) { ProfileScreen(vm, { navController.navigate(Screen.OrderTracking.route) }, { navController.navigate(Screen.TrialExperienceLive.route) }, { navController.navigate(Screen.ExchangeHome.route) }, { navController.navigate(Screen.Wishlist.route) }, { navController.navigate(Screen.HelpSupport.route) }, { navController.navigate(Screen.AuthPhone.route) }) }
+            composable(Screen.Profile.route) { ProfileScreen(vm, { navController.navigate(Screen.OrderTracking.route) }, { navController.navigate(Screen.TrialExperienceLive.route) }, { navController.navigate(Screen.ExchangeHome.route) }, { navController.navigate(Screen.Wishlist.route) }, { navController.navigate(Screen.HelpSupport.route) }, { navController.navigate(Screen.AddressBook.route) }, { navController.navigate(Screen.AuthPhone.route) }) }
             composable(Screen.Wishlist.route) { WishlistScreen(vm, { navController.popBackStack() }, { p -> vm.addToCart(p); vm.toggleWishlist(p); navController.navigate(Screen.Cart.route) }) }
             composable(Screen.HelpSupport.route) { HelpSupportScreen { navController.popBackStack() } }
             composable(Screen.VirtualTryOn.route) { VirtualTryOnScreen(vm, { navController.popBackStack() }, { navController.navigate(Screen.TryAtHomeInfo.route) }, { navController.navigate(Screen.Cart.route) }) }
+            composable(Screen.AddressBook.route) { AddressBookScreen(vm) { navController.popBackStack() } }
             composable(Screen.SellerChat.route, arguments = listOf(navArgument("productId") { type = NavType.StringType })) { entry ->
                 val pId = entry.arguments?.getString("productId") ?: "1"
                 val product = vm.state.collectAsState().value.products.find { it.id == pId } ?: sampleProducts[0]
@@ -1245,7 +1267,7 @@ fun ReturnsAfterTrialScreen(vm: MainViewModel, onBack: () -> Unit, onRequestPick
 
 // --- 28. PROFILE ---
 @Composable
-fun ProfileScreen(vm: MainViewModel, onOpenOrders: () -> Unit, onOpenTrials: () -> Unit, onOpenExchanges: () -> Unit, onOpenWishlist: () -> Unit, onOpenSupport: () -> Unit, onLogout: () -> Unit) {
+fun ProfileScreen(vm: MainViewModel, onOpenOrders: () -> Unit, onOpenTrials: () -> Unit, onOpenExchanges: () -> Unit, onOpenWishlist: () -> Unit, onOpenSupport: () -> Unit, onOpenAddressBook: () -> Unit, onLogout: () -> Unit) {
     val state by vm.state.collectAsState()
     Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1262,6 +1284,7 @@ fun ProfileScreen(vm: MainViewModel, onOpenOrders: () -> Unit, onOpenTrials: () 
         ProfileMenuRow("My Orders", onOpenOrders)
         ProfileMenuRow("My Trials", onOpenTrials)
         ProfileMenuRow("My Exchanges", onOpenExchanges)
+        ProfileMenuRow("Addresses", onOpenAddressBook)
         ProfileMenuRow("Wishlist", onOpenWishlist)
         ProfileMenuRow("Help & Support", onOpenSupport)
         ProfileMenuRow("Logout", { vm.logout(); onLogout() }, isRed = true)
@@ -1321,7 +1344,7 @@ fun HelpSupportScreen(onBack: () -> Unit) {
 }
 
 @Composable
-fun SupportCard(title: String, sub: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+fun SupportCard(title: String, sub: String, icon: ImageVector) {
     Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, contentDescription = null, tint = GoldDark, modifier = Modifier.size(18.dp))
@@ -1341,4 +1364,142 @@ fun VirtualTryOnScreen(vm: MainViewModel, onBack: () -> Unit, onTryAtHome: () ->
     val lifecycleOwner = context as? LifecycleOwner
     val state by vm.state.collectAsState()
     var hasCamera by remember { mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasCamera = it
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasCamera = it }
+
+    LaunchedEffect(Unit) { if (!hasCamera) launcher.launch(Manifest.permission.CAMERA) }
+    var jewelryOffset by remember { mutableStateOf(Offset(0f, 50f)) }
+    var jewelryScale by remember { mutableFloatStateOf(1.0f) }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        if (hasCamera && lifecycleOwner != null) {
+            AndroidView(
+                factory = { ctx ->
+                    val view = PreviewView(ctx)
+                    val providerFuture = ProcessCameraProvider.getInstance(ctx)
+                    providerFuture.addListener({
+                        try {
+                            val provider = providerFuture.get()
+                            val preview = Preview.Builder().build().also { it.setSurfaceProvider(view.surfaceProvider) }
+                            provider.unbindAll()
+                            provider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_FRONT_CAMERA, preview)
+                        } catch (e: Exception) { e.printStackTrace() }
+                    }, ContextCompat.getMainExecutor(ctx))
+                    view
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Row(modifier = Modifier.fillMaxWidth().padding(14.dp).align(Alignment.TopStart), horizontalArrangement = Arrangement.SpaceBetween) {
+            IconButton(onClick = onBack, modifier = Modifier.clip(CircleShape).background(Color.White.copy(0.8f))) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark)
+            }
+        }
+        Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) { detectTransformGestures { _, pan, zoom, _ -> jewelryScale = (jewelryScale * zoom).coerceIn(0.6f, 2.2f); jewelryOffset = Offset(jewelryOffset.x + pan.x, jewelryOffset.y + pan.y) } }, contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.offset(x = jewelryOffset.x.dp, y = jewelryOffset.y.dp)) {
+                Text(state.activeVtoProduct.emoji, fontSize = (80 * jewelryScale).sp)
+            }
+        }
+        Surface(color = LightCard.copy(0.95f), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp), modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onTryAtHome, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldDark)) {
+                        Text("Try @Home", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DarkCanvas)
+                    }
+                    Button(onClick = { vm.addToCart(state.activeVtoProduct); onBuyNow() }, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary)) {
+                        Text("Buy (₹${state.activeVtoProduct.price.toInt()})", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- SELLER BARGAIN CHAT ---
+@Composable
+fun SellerChatScreen(product: Product, vm: MainViewModel, onBack: () -> Unit, onCheckout: () -> Unit) {
+    val state by vm.state.collectAsState()
+    var msgText by remember { mutableStateOf("") }
+    var offerInput by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Jaipur Jewels (${product.name.take(10)}…)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextDark) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark) } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightCanvas)
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding).background(LightCanvas)) {
+            LazyColumn(modifier = Modifier.weight(1f).padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                items(state.chatMessages) { msg ->
+                    val isBuyer = msg.senderId == "buyer"
+                    Column(horizontalAlignment = if (isBuyer) Alignment.End else Alignment.Start, modifier = Modifier.fillMaxWidth()) {
+                        Surface(shape = RoundedCornerShape(10.dp), color = if (isBuyer) GoldLight else LightCard, border = if (!isBuyer) BorderStroke(1.dp, LightBorder) else null, modifier = Modifier.widthIn(max = 250.dp)) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Text(msg.text, color = TextDark, fontSize = 11.sp)
+                                if (msg.counterAmount != null) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Button(onClick = { vm.acceptCounterOffer(product.id, msg.counterAmount); vm.addToCart(product, msg.counterAmount); onCheckout() }, colors = ButtonDefaults.buttonColors(containerColor = EmeraldSuccess), shape = RoundedCornerShape(4.dp)) {
+                                        Text("Accept ₹${msg.counterAmount.toInt()}", color = LightCard, fontSize = 9.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Surface(color = LightCard, modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.padding(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Button(onClick = { showDialog = true }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(12.dp)) {
+                        Text("Bargain", color = DarkCanvas, fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    OutlinedTextField(value = msgText, onValueChange = { msgText = it }, placeholder = { Text("Message…", fontSize = 10.sp) }, modifier = Modifier.weight(1f), singleLine = true)
+                    IconButton(onClick = { if (msgText.isNotBlank()) { vm.sendTextMessage(msgText); msgText = "" } }) {
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = GoldDark)
+                    }
+                }
+            }
+        }
+    }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Offer to Jeweller") },
+            text = { OutlinedTextField(value = offerInput, onValueChange = { offerInput = it }, label = { Text("Amount (₹)") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)) },
+            confirmButton = { Button(onClick = { val amt = offerInput.toDoubleOrNull(); if (amt != null) vm.sendBargainOffer(product.id, amt); showDialog = false }) { Text("Send") } }
+        )
+    }
+}
+
+// --- 11b. ADDRESS BOOK ---
+@Composable
+fun AddressBookScreen(vm: MainViewModel, onBack: () -> Unit) {
+    val state by vm.state.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Saved Addresses", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Button(onClick = { vm.autoDetectGps() }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Text("📍 Auto-Detect Live GPS Location", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        state.addresses.forEach { addr ->
+            val isSel = state.selectedAddress.id == addr.id
+            Card(colors = CardDefaults.cardColors(containerColor = if (isSel) GoldLight.copy(alpha = 0.25f) else LightCard), border = BorderStroke(1.dp, if (isSel) GoldPrimary else LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).clickable { vm.selectAddress(addr) }) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("${addr.label} · ${addr.recipientName}", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                        if (isSel) Surface(color = GoldPrimary, shape = RoundedCornerShape(4.dp)) { Text("Active", color = DarkCanvas, fontSize = 8.sp, modifier = Modifier.padding(4.dp, 1.dp)) }
+                    }
+                    Text(addr.addressLine, fontSize = 10.sp, color = TextMuted)
+                }
+            }
+        }
+    }
+}

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.roldygoldy.app
 
 import android.Manifest
@@ -135,7 +137,6 @@ data class ExchangeSlip(
     val date: String
 )
 
-// Sample Products
 val sampleProducts = listOf(
     Product("1", "Sabyasachi-inspired Kundan Choker", "Bridal Studio", 3499.0, 4499.0, "👑", true, "1-Gram Matte Gold Plated", "Handcrafted Kundan, green glass stones with adjustable golden dori. Comes in a royal trousseau box."),
     Product("2", "Korean Minimal Hoops", "Daily Wear", 349.0, 549.0, "💫", false, "18K PVD Anti-Tarnish", "Waterproof and sweatproof daily minimal hoops with hypoallergenic titanium core."),
@@ -146,11 +147,11 @@ val sampleProducts = listOf(
 val sampleAddresses = listOf(
     Address("a1", "Home", "Sai Kishore Bandaru", "Flat 402, Golden Palms, Bandra West, Mumbai", "400050", 2.4, isDefault = true),
     Address("a2", "Office", "Sai Kishore Bandaru", "Level 6, Tech Park, BKC, Mumbai", "400051", 4.1, isDefault = false),
-    Address("a3", "Parents", "Sai Kishore Bandaru", "B-12, Sector 9, Vashi, Navi Mumbai", "400703", 18.5, isDefault = false) // Out of 5km range
+    Address("a3", "Parents", "Sai Kishore Bandaru", "B-12, Sector 9, Vashi, Navi Mumbai", "400703", 18.5, isDefault = false)
 )
 
 // ==========================================
-// 🧠 VIEWMODEL & CENTRAL STATE
+// 🧠 VIEWMODEL & STATE
 // ==========================================
 data class AppState(
     val userFirstName: String = "Sai Kishore",
@@ -188,9 +189,7 @@ class MainViewModel : ViewModel() {
     val state = _state.asStateFlow()
     private var timerJob: Job? = null
 
-    init {
-        recalculateTrialDistanceAndFee()
-    }
+    init { recalculateTrialDistanceAndFee() }
 
     fun setCategory(cat: String) { _state.update { it.copy(selectedCategory = cat) } }
     fun toggleTrialFilter(on: Boolean) { _state.update { it.copy(trialOnlyFilter = on) } }
@@ -207,18 +206,17 @@ class MainViewModel : ViewModel() {
             dist <= 2.0 -> 49
             dist <= 3.5 -> 69
             dist <= 5.0 -> 99
-            else -> 99 // Out of range flag
+            else -> 99
         }
         _state.update { it.copy(trialFee = baseFee) }
     }
 
     fun setSlot(slot: String) { _state.update { it.copy(selectedSlot = slot) } }
 
-    // Exchange / Scrap calculation: 100g = ₹30-₹35 with 10% purity deduction
     fun applyExchange(itemName: String, weightGrams: Double) {
-        val grossRate = 0.35 // ₹0.35 per gram
+        val grossRate = 0.35
         val gross = weightGrams * grossRate
-        val net = (gross * 0.90) // 10% deduction for wastage/impurities
+        val net = gross * 0.90
         val slip = ExchangeSlip(
             id = "EX-${System.currentTimeMillis().toString().takeLast(4)}",
             itemName = itemName.ifBlank { "Old Jewellery Scrap" },
@@ -235,11 +233,8 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    fun removeExchange() {
-        _state.update { it.copy(appliedExchangeSlip = null) }
-    }
+    fun removeExchange() { _state.update { it.copy(appliedExchangeSlip = null) } }
 
-    // Bargaining
     fun sendOffer(offerAmt: Double) {
         val userMsg = ChatMessage(System.currentTimeMillis().toString(), "buyer", "I'd like to offer ₹${offerAmt.toInt()} for this piece.", "Just now")
         _state.update { it.copy(chatMessages = it.chatMessages + userMsg) }
@@ -250,7 +245,7 @@ class MainViewModel : ViewModel() {
             val sellerMsg = ChatMessage(
                 (System.currentTimeMillis() + 1).toString(),
                 "seller",
-                "Received your offer on the Vendor Portal! The best artisanal price I can do is ₹${counter.toInt()}.",
+                "Received your offer on the Vendor Portal! The best discounted price is ₹${counter.toInt()}.",
                 "Just now",
                 counterAmount = counter
             )
@@ -267,13 +262,12 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    // Trial Timer with ₹1/min overage after 5 min grace
     fun startTrial() {
         _state.update { it.copy(isTrialActive = true, trialSecondsElapsed = 0) }
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
-                delay(1000) // 1s = 1 simulated min for demo
+                delay(1000)
                 _state.update { it.copy(trialSecondsElapsed = it.trialSecondsElapsed + 1) }
             }
         }
@@ -298,12 +292,12 @@ class MainViewModel : ViewModel() {
 // ==========================================
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object Home : Screen("home", "Home", Icons.Default.Home)
-    data object Trial : Screen("trial", "Trial", Icons.Default.Schedule)
-    data object Exchange : Screen("exchange", "Exchange", Icons.Default.Cached)
-    data object Orders : Screen("orders", "Orders", Icons.Default.LocalShipping)
-    data object Profile : Screen("profile", "Profile", Icons.Default.Person)
-    data object VirtualTryOn : Screen("vto", "3D Mirror", Icons.Default.CameraAlt)
-    data object SellerChat : Screen("chat", "Chat", Icons.Default.Chat)
+    data object Trial : Screen("trial", "Trial", Icons.Default.ShoppingCart)
+    data object Exchange : Screen("exchange", "Exchange", Icons.Default.Refresh)
+    data object Orders : Screen("orders", "Orders", Icons.Default.Person)
+    data object Profile : Screen("profile", "Profile", Icons.Default.Settings)
+    data object VirtualTryOn : Screen("vto", "3D Mirror", Icons.Default.Star)
+    data object SellerChat : Screen("chat", "Chat", Icons.Default.Email)
     data object AddressBook : Screen("address_book", "Addresses", Icons.Default.Place)
     data object ProductDetail : Screen("pdp/{productId}", "Details", Icons.Default.Home) {
         fun createRoute(id: String) = "pdp/$id"
@@ -336,7 +330,6 @@ fun AppRootNavigator(vm: MainViewModel = viewModel()) {
     val navItems = listOf(Screen.Home, Screen.Trial, Screen.Exchange, Screen.Orders, Screen.Profile)
     val isTopLevel = currentRoute in navItems.map { it.route }
 
-    // System Back Handler
     BackHandler(enabled = currentRoute != Screen.Home.route) {
         if (!isTopLevel) {
             navController.popBackStack()
@@ -448,8 +441,7 @@ fun AppRootNavigator(vm: MainViewModel = viewModel()) {
             composable(Screen.Orders.route) {
                 OrderTrackingAndHistoryScreen(
                     vm = vm,
-                    onBack = { navController.popBackStack() },
-                    onContactSupport = { navController.navigate(Screen.Profile.route) }
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(Screen.Profile.route) {
@@ -470,7 +462,6 @@ fun AppRootNavigator(vm: MainViewModel = viewModel()) {
         }
     }
 
-    // Policy Bottom Sheet
     if (state.policySheetTitle != null) {
         ModalBottomSheet(
             onDismissRequest = { vm.dismissPolicy() },
@@ -508,7 +499,6 @@ fun HomeScreen(
     val categories = listOf("All", "Daily Wear", "Bridal Studio", "Temple Hub")
 
     Column(modifier = Modifier.fillMaxSize().background(IvorySilky)) {
-        // Luxury Header
         Surface(color = WineVelvet, modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp)) {
                 Row(
@@ -523,7 +513,7 @@ fun HomeScreen(
                             modifier = Modifier.clickable { onOpenAddress() }
                         ) {
                             Text("📍 ${state.selectedAddress.label}: ${state.selectedAddress.pincode} (${state.selectedAddress.distanceKm} km)", color = GoldLight, fontSize = 11.sp)
-                            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = GoldLight, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Place, contentDescription = null, tint = GoldLight, modifier = Modifier.size(16.dp))
                         }
                     }
                     Button(
@@ -538,7 +528,6 @@ fun HomeScreen(
             }
         }
 
-        // Categories Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -554,7 +543,6 @@ fun HomeScreen(
             }
         }
 
-        // Trial Only Filter Toggle
         Card(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
             colors = CardDefaults.cardColors(containerColor = EmeraldPrestige.copy(alpha = 0.08f))
@@ -576,7 +564,6 @@ fun HomeScreen(
             }
         }
 
-        // Product Catalog Grid
         val filtered = state.products.filter {
             (state.selectedCategory == "All" || it.category == state.selectedCategory) &&
                     (!state.trialOnlyFilter || it.isTrialEligible)
@@ -634,7 +621,6 @@ fun HomeScreen(
 // ==========================================
 // 🔍 2. PRODUCT DETAILS (PDP) SCREEN
 // ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PdpScreen(
     product: Product,
@@ -687,7 +673,6 @@ fun PdpScreen(
                 Text(product.name, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = WineDark)
                 Text(product.karatInfo, fontSize = 12.sp, color = EmeraldPrestige, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 2.dp))
 
-                // Price Row
                 Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(vertical = 10.dp)) {
                     Text("₹${finalPayable.toInt()}", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, color = WineRich)
                     Spacer(modifier = Modifier.width(8.dp))
@@ -700,7 +685,6 @@ fun PdpScreen(
                     }
                 }
 
-                // Applied Exchange Credit Strip
                 if (state.appliedExchangeSlip != null) {
                     Card(
                         colors = CardDefaults.cardColors(containerColor = EmeraldSoft),
@@ -726,7 +710,6 @@ fun PdpScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 3D Mirror Try On
                 Button(
                     onClick = onOpenVto,
                     modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -738,7 +721,6 @@ fun PdpScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Doorstep Trial
                 if (product.isTrialEligible) {
                     Button(
                         onClick = onBookTrial,
@@ -751,7 +733,6 @@ fun PdpScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
-                // Bargain Chat
                 OutlinedButton(
                     onClick = onOpenChat,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
@@ -763,7 +744,6 @@ fun PdpScreen(
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Exchange trade-in
                 Card(
                     modifier = Modifier.fillMaxWidth().clickable { onOpenExchange() },
                     colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -820,12 +800,10 @@ fun InteractiveLenskartVtoScreen(
 
     LaunchedEffect(Unit) { if (!hasCamera) launcher.launch(Manifest.permission.CAMERA) }
 
-    // Interactive Drag & Scale Anchors
     var jewelryOffset by remember { mutableStateOf(Offset(0f, 60f)) }
     var jewelryScale by remember { mutableFloatStateOf(1.0f) }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // CameraX Live Feed
         if (hasCamera && lifecycleOwner != null) {
             AndroidView(
                 factory = { ctx ->
@@ -847,7 +825,6 @@ fun InteractiveLenskartVtoScreen(
             )
         }
 
-        // Top Controls Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -878,7 +855,6 @@ fun InteractiveLenskartVtoScreen(
             }
         }
 
-        // Augmented Drag/Scale Jewelry Layer
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -892,8 +868,7 @@ fun InteractiveLenskartVtoScreen(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .offset(x = jewelryOffset.x.dp, y = jewelryOffset.y.dp)
+                modifier = Modifier.offset(x = jewelryOffset.x.dp, y = jewelryOffset.y.dp)
             ) {
                 Text(
                     text = state.activeVtoProduct.emoji,
@@ -902,7 +877,6 @@ fun InteractiveLenskartVtoScreen(
             }
         }
 
-        // Bottom Selector & Dual Try-On Funnel
         Surface(
             color = Color.White.copy(alpha = 0.95f),
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
@@ -934,7 +908,6 @@ fun InteractiveLenskartVtoScreen(
                     }
                 }
 
-                // Dual Funnel CTA
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -968,7 +941,6 @@ fun InteractiveLenskartVtoScreen(
 // ==========================================
 // 🛵 4. TRIAL @HOME (15-20 MIN + ₹1/MIN OVERAGE & GPS DISTANCE)
 // ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrialBookingScreen(
     vm: MainViewModel,
@@ -1002,7 +974,6 @@ fun TrialBookingScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Delivery Address GPS Distance Strip
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(14.dp),
@@ -1039,7 +1010,6 @@ fun TrialBookingScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Pricing & Overage Notice Box
             Card(
                 colors = CardDefaults.cardColors(containerColor = WineVelvet),
                 shape = RoundedCornerShape(16.dp),
@@ -1059,7 +1029,7 @@ fun TrialBookingScreen(
                             Text("15–20 Min Tryout", color = WineDark, fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(8.dp, 4.dp))
                         }
                     }
-                    Divider(color = WineRich, modifier = Modifier.padding(vertical = 10.dp))
+                    HorizontalDivider(color = WineRich, modifier = Modifier.padding(vertical = 10.dp))
                     Text(
                         text = "• First 15–20 mins covered in this booking fee.\n• 5-minute grace period included.\n• ₹1/minute overage applies after grace period expires.\n• Fee waived against purchase if you keep an item.",
                         color = IvorySilky,
@@ -1071,7 +1041,6 @@ fun TrialBookingScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Time Slots
             Text("Select Tryout Time Slot:", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = WineDark)
             val slots = listOf("Today, 4 PM – 6 PM", "Tomorrow, 10 AM – 12 PM", "Tomorrow, 4 PM – 6 PM")
             Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -1093,7 +1062,6 @@ fun TrialBookingScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Old Jewellery Exchange Trigger
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 border = BorderStroke(1.dp, GlassBorder),
@@ -1142,9 +1110,8 @@ fun TrialBookingScreen(
 }
 
 // ==========================================
-// ♻️ 5. OLD JEWELLERY EXCHANGE & VALUATION SCREEN
+// ♻️ 5. OLD JEWELLERY EXCHANGE SCREEN
 // ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExchangeScrapScreen(
     vm: MainViewModel,
@@ -1158,7 +1125,7 @@ fun ExchangeScrapScreen(
 
     val grams = gramsInput.toDoubleOrNull() ?: 0.0
     val gross = grams * 0.35
-    val netCredit = (gross * 0.90) // 10% deduction
+    val netCredit = gross * 0.90
 
     Scaffold(
         topBar = {
@@ -1185,7 +1152,6 @@ fun ExchangeScrapScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Policy / Rules Card
             Card(
                 colors = CardDefaults.cardColors(containerColor = EmeraldSoft.copy(alpha = 0.7f)),
                 shape = RoundedCornerShape(12.dp)
@@ -1198,7 +1164,6 @@ fun ExchangeScrapScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Form
             OutlinedTextField(
                 value = itemName,
                 onValueChange = { itemName = it },
@@ -1220,7 +1185,6 @@ fun ExchangeScrapScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Live Camera Photo Capture
             Button(
                 onClick = { photoCaptured = true },
                 colors = ButtonDefaults.buttonColors(containerColor = if (photoCaptured) EmeraldPrestige else WineDark),
@@ -1232,7 +1196,6 @@ fun ExchangeScrapScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Live Valuation Box
             Card(
                 colors = CardDefaults.cardColors(containerColor = WineVelvet),
                 shape = RoundedCornerShape(16.dp),
@@ -1268,7 +1231,6 @@ fun ExchangeScrapScreen(
 // ==========================================
 // 💬 6. SELLER BARGAINING CHAT SCREEN
 // ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SellerChatScreen(
     vm: MainViewModel,
@@ -1299,7 +1261,6 @@ fun SellerChatScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.fillMaxSize().padding(padding).background(IvorySilky)) {
-            // Chat Message Stream
             LazyColumn(
                 modifier = Modifier.weight(1f).padding(14.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -1334,7 +1295,6 @@ fun SellerChatScreen(
                 }
             }
 
-            // Input Strip
             Surface(color = Color.White, modifier = Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                     Button(
@@ -1395,12 +1355,10 @@ fun SellerChatScreen(
 // ==========================================
 // 📦 7. ORDERS, TRACKING & TRIAL TIMER
 // ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderTrackingAndHistoryScreen(
     vm: MainViewModel,
-    onBack: () -> Unit,
-    onContactSupport: () -> Unit
+    onBack: () -> Unit
 ) {
     val state by vm.state.collectAsState()
     val elapsed = state.trialSecondsElapsed
@@ -1426,7 +1384,6 @@ fun OrderTrackingAndHistoryScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // Live Concierge Status
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF1ECE4)),
                 modifier = Modifier.fillMaxWidth().height(120.dp)
@@ -1441,7 +1398,6 @@ fun OrderTrackingAndHistoryScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Doorstep Tryout Timer & Overage Hub
             Card(
                 colors = CardDefaults.cardColors(containerColor = WineDark),
                 shape = RoundedCornerShape(16.dp),
@@ -1512,7 +1468,6 @@ fun ProfileHubScreen(
             .background(IvorySilky)
             .verticalScroll(rememberScrollState())
     ) {
-        // Profile Header
         Surface(color = WineVelvet, modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1537,11 +1492,11 @@ fun ProfileHubScreen(
             Card(colors = CardDefaults.cardColors(containerColor = Color.White), modifier = Modifier.fillMaxWidth().padding(top = 6.dp)) {
                 Column {
                     ProfileMenuRow("📍 Address Book", "Manage delivery and Trial @Home addresses") { onOpenAddressBook() }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("📦 Order & Trial History", "View invoices, tryout slips & tracking") { onOpenOrders() }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("💬 Seller Chat Threads", "Active bargains & vendor replies") { onOpenChats() }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("♻️ Exchange & Valuation Slips", "Track scrap trade-in credit history") { onOpenExchangeHistory() }
                 }
             }
@@ -1554,15 +1509,15 @@ fun ProfileHubScreen(
                     ProfileMenuRow("📜 Terms & Conditions", "Platform rules and usage policies") {
                         vm.showPolicy("Terms & Conditions", "1. Trial @Home is restricted to a 5km radius from our partner boutiques.\n2. Initial trial booking fee covers 15-20 minutes plus a 5-minute grace period.\n3. ₹1 per minute applies for extra tryout time.")
                     }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("🔒 Privacy Policy", "How we protect and secure your data") {
                         vm.showPolicy("Privacy Policy", "Your personal information, address geocodes, and camera feeds during Virtual Try-On are processed securely on-device and never stored on third-party servers.")
                     }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("🔄 Refund & Cancellation Policy", "Tryout fee waivers & product returns") {
                         vm.showPolicy("Refund Policy", "The trial fee is non-refundable if all items are rejected at doorstep. If any item is purchased, the full trial fee is adjusted against your bill.")
                     }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("♻️ Exchange & Trade-In Rules", "10% deduction & metal valuation slabs") {
                         vm.showPolicy("Exchange Policy", "Old jewellery is valued at ₹0.30–₹0.35/g net of a 10% purity check deduction. Strictly no plastic/synthetic items are accepted.")
                     }
@@ -1577,7 +1532,7 @@ fun ProfileHubScreen(
                     ProfileMenuRow("💬 WhatsApp Support", "Live chat with customer concierge") {
                         vm.showPolicy("Customer Care", "WhatsApp Support: +91 98765 00000\nEmail: care@roldygoldy.com\nTimings: 9 AM - 9 PM IST")
                     }
-                    Divider(color = Color(0xFFF1ECE4))
+                    HorizontalDivider(color = Color(0xFFF1ECE4))
                     ProfileMenuRow("🚪 Logout", "Sign out of your RoldyGoldy account") {
                         vm.showPolicy("Sign Out", "You have successfully signed out of the prototype demo.")
                     }
@@ -1605,7 +1560,6 @@ fun ProfileMenuRow(title: String, subtitle: String, onClick: () -> Unit) {
 // ==========================================
 // 📍 9. ADDRESS BOOK SCREEN
 // ==========================================
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddressBookScreen(vm: MainViewModel, onBack: () -> Unit) {
     val state by vm.state.collectAsState()

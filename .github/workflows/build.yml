@@ -21,16 +21,16 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.x'
           channel: 'stable'
 
-      - name: Recreate Android Project & Asset Folders
+      - name: Clean and Generate Android Scaffold
         run: |
-          mkdir -p assets/images assets/jewellery
+          rm -rf android app build .dart_tool build.gradle.kts settings.gradle.kts gradle.properties
+          mkdir -p assets/images
           flutter create --platforms=android --org com.roldygoldy --project-name roldygoldy_ui .
           flutter pub get
 
-      - name: Build APK
+      - name: Build Debug APK
         run: flutter build apk --debug
 
       - name: Upload APK

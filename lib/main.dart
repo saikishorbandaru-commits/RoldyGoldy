@@ -177,11 +177,10 @@ class AppState extends ChangeNotifier {
   }
 }
 
-// Global instance of AppState
 final appState = AppState();
 
 // ==========================================
-// 🚀 APP ENTRY POINT
+// 🚀 APP ENTRY
 // ==========================================
 void main() {
   runApp(const RoldyGoldyApp());
@@ -285,7 +284,7 @@ class _MainNavShellState extends State<MainNavShell> {
 }
 
 // ==========================================
-// 📱 01–06: ONBOARDING & AUTHENTICATION
+// 📱 01–06: ONBOARDING & AUTH
 // ==========================================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -1338,8 +1337,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           children: [
             const Text('Delivery Address', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
             Card(
-              child: const ListTile(
-                title: Text('21-1-564, Lakdi Ka Pul, Hyderabad...', style: TextStyle(fontSize: 11)),
+              child: ListTile(
+                title: const Text('21-1-564, Lakdi Ka Pul, Hyderabad...', style: TextStyle(fontSize: 11)),
               ),
             ),
             const SizedBox(height: 14),
@@ -1417,9 +1416,9 @@ class OrderTrackingScreen extends StatelessWidget {
         child: Column(
           children: [
             Card(
-              child: const ListTile(
-                title: Text('RGORD123456', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                subtitle: Text('Delivery Partner: Vikram (Express Hub)'),
+              child: ListTile(
+                title: const Text('RGORD123456', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                subtitle: const Text('Delivery Partner: Vikram (Express Hub)'),
               ),
             ),
             const SizedBox(height: 14),

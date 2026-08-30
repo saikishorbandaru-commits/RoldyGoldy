@@ -23,13 +23,15 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Clean Old Files & Create Android Project
+      - name: Build Application APK
         run: |
-          find . -maxdepth 1 ! -name 'lib' ! -name 'pubspec.yaml' ! -name '.github' ! -name '.' ! -name '..' -exec rm -rf {} +
-          mkdir -p assets/images
-          flutter create --platforms=android --org com.roldygoldy --project-name roldygoldy_ui .
-          flutter pub get
+          flutter create --org com.roldygoldy roldygoldy_app
+          cp lib/main.dart roldygoldy_app/lib/main.dart
+          cd roldygoldy_app
           flutter build apk --debug
+          cd ..
+          mkdir -p build/app/outputs/flutter-apk
+          cp roldygoldy_app/build/app/outputs/flutter-apk/app-debug.apk build/app/outputs/flutter-apk/app-debug.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

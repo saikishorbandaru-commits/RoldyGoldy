@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Flutter APK
 
 on:
   push:
@@ -12,22 +12,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          gradle-version: '8.7'
+          flutter-version: '3.24.x'
+          channel: 'stable'
 
-      - name: Build Debug APK
-        run: gradle assembleDebug --stacktrace
+      - name: Auto-generate Android Scaffolding
+        run: flutter create --platforms=android --org com.roldygoldy .
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build Release APK
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: RoldyGoldy-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: RoldyGoldy-Flutter-APK
+          path: build/app/outputs/flutter-apk/app-release.apk

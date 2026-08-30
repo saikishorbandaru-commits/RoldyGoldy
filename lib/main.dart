@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 // ==========================================
-// 🎨 PALETTE & STYLING
+// 🎨 LUXURY PALETTE (From Flow Diagram)
 // ==========================================
 class AppColors {
   static const Color wineDark = Color(0xFF140C07);
@@ -46,23 +44,12 @@ class Product {
   final String description;
 
   Product({
-    required this.id,
-    required this.name,
-    required this.category,
-    required this.price,
-    required this.originalPrice,
-    required this.emoji,
-    this.isTrialEligible = true,
-    required this.tag,
-    required this.karatInfo,
-    required this.grossWeight,
-    required this.netWeight,
-    required this.metalType,
-    required this.stoneType,
-    required this.size,
-    required this.closure,
-    required this.hallmark,
-    required this.description,
+    required this.id, required this.name, required this.category,
+    required this.price, required this.originalPrice, required this.emoji,
+    this.isTrialEligible = true, required this.tag, required this.karatInfo,
+    required this.grossWeight, required this.netWeight, required this.metalType,
+    required this.stoneType, required this.size, required this.closure,
+    required this.hallmark, required this.description,
   });
 }
 
@@ -70,9 +57,7 @@ class CartItem {
   final Product product;
   int quantity;
   double? customPrice;
-
   CartItem({required this.product, this.quantity = 1, this.customPrice});
-
   double get unitPrice => customPrice ?? product.price;
   double get total => unitPrice * quantity;
 }
@@ -85,20 +70,11 @@ class OrderItem {
   final String status;
   final String date;
   final bool isTrial;
-
-  OrderItem({
-    required this.orderId,
-    required this.productName,
-    required this.emoji,
-    required this.amount,
-    required this.status,
-    required this.date,
-    this.isTrial = false,
-  });
+  OrderItem({required this.orderId, required this.productName, required this.emoji, required this.amount, required this.status, required this.date, this.isTrial = false});
 }
 
 // ==========================================
-// 🧠 GLOBAL APP STATE
+// 🧠 GLOBAL APP STATE (Inherited State)
 // ==========================================
 class AppState extends ChangeNotifier {
   bool isFirstTimeUser = true;
@@ -109,76 +85,31 @@ class AppState extends ChangeNotifier {
 
   final List<Product> products = [
     Product(
-      id: '1',
-      name: 'Kundan Choker Necklace',
-      category: 'Bridal',
-      price: 3499,
-      originalPrice: 4899,
-      emoji: '👑',
-      tag: 'HOT',
-      karatInfo: '1-Gram Matte Gold Plated',
-      grossWeight: '48.5 g',
-      netWeight: '36.2 g',
-      metalType: 'Brass & Copper Alloy',
-      stoneType: 'Hand-cut Kundan & Emeralds',
-      size: 'Adjustable 12–18 in',
-      closure: 'Golden Zari Dori',
-      hallmark: 'RG 1-Gram Certified',
+      id: '1', name: 'Kundan Choker Necklace', category: 'Bridal', price: 3499, originalPrice: 4899,
+      emoji: '👑', tag: 'HOT', karatInfo: '1-Gram Matte Gold Plated', grossWeight: '48.5 g', netWeight: '36.2 g',
+      metalType: 'Brass & Copper Alloy', stoneType: 'Hand-cut Kundan & Emeralds', size: 'Adjustable 12–18 in',
+      closure: 'Golden Zari Dori', hallmark: 'RG 1-Gram Certified',
       description: 'Royal bridal choker set with Kundan foil work and velvet trousseau box packaging.',
     ),
     Product(
-      id: '2',
-      name: 'Korean Minimal Hoops',
-      category: 'Daily Wear',
-      price: 349,
-      originalPrice: 549,
-      emoji: '💫',
-      tag: 'NEW',
-      karatInfo: '18K PVD Anti-Tarnish',
-      isTrialEligible: false,
-      grossWeight: '6.8 g',
-      netWeight: '6.8 g',
-      metalType: '316L Surgical Titanium',
-      stoneType: 'AAA+ Cubic Zirconia',
-      size: '18mm Diameter',
-      closure: 'Click-top Latch',
-      hallmark: '18K PVD Certified',
+      id: '2', name: 'Korean Minimal Hoops', category: 'Daily Wear', price: 349, originalPrice: 549,
+      emoji: '💫', tag: 'NEW', karatInfo: '18K PVD Anti-Tarnish', isTrialEligible: false, grossWeight: '6.8 g',
+      netWeight: '6.8 g', metalType: '316L Surgical Titanium', stoneType: 'AAA+ Cubic Zirconia', size: '18mm Diameter',
+      closure: 'Click-top Latch', hallmark: '18K PVD Certified',
       description: 'Waterproof daily minimal hoops with hypoallergenic titanium core.',
     ),
     Product(
-      id: '3',
-      name: 'Temple Deity Jhumka Set',
-      category: 'Temple',
-      price: 1299,
-      originalPrice: 1899,
-      emoji: '🪔',
-      tag: 'BESTSELLER',
-      karatInfo: 'Antique Micro-Gold',
-      grossWeight: '38.2 g',
-      netWeight: '30.5 g',
-      metalType: "Jeweller's Bronze Alloy",
-      stoneType: 'Kemp Stones & Pearls',
-      size: 'Adjustable 14–16 in',
-      closure: 'Metallic Lobster Lock',
-      hallmark: 'Micro-Gold Guaranteed',
+      id: '3', name: 'Temple Deity Jhumka Set', category: 'Temple', price: 1299, originalPrice: 1899,
+      emoji: '🪔', tag: 'BESTSELLER', karatInfo: 'Antique Micro-Gold', grossWeight: '38.2 g', netWeight: '30.5 g',
+      metalType: "Jeweller's Bronze Alloy", stoneType: 'Kemp Stones & Pearls', size: 'Adjustable 14–16 in',
+      closure: 'Metallic Lobster Lock', hallmark: 'Micro-Gold Guaranteed',
       description: 'South Indian temple deity motif sculpted with ruby kemp stones.',
     ),
     Product(
-      id: '4',
-      name: 'Polki Bridal Maangtikka',
-      category: 'Bridal',
-      price: 2899,
-      originalPrice: 3599,
-      emoji: '💍',
-      tag: 'HOT',
-      karatInfo: 'Uncut Polki Foil',
-      grossWeight: '22.4 g',
-      netWeight: '18.1 g',
-      metalType: 'Copper & Silver Alloy',
-      stoneType: 'Uncut Polki & Onyx',
-      size: '5.5 in Length',
-      closure: 'Anchor Hook',
-      hallmark: 'Artisan Certified',
+      id: '4', name: 'Polki Bridal Maangtikka', category: 'Bridal', price: 2899, originalPrice: 3599,
+      emoji: '💍', tag: 'HOT', karatInfo: 'Uncut Polki Foil', grossWeight: '22.4 g', netWeight: '18.1 g',
+      metalType: 'Copper & Silver Alloy', stoneType: 'Uncut Polki & Onyx', size: '5.5 in Length',
+      closure: 'Anchor Hook', hallmark: 'Artisan Certified',
       description: 'Floral bridal maangtikka with hanging dark green onyx bead drops.',
     ),
   ];
@@ -196,30 +127,13 @@ class AppState extends ChangeNotifier {
   String selectedSlot = 'Evening (04:00 PM - 07:00 PM)';
   final int trialFee = 99;
 
-  void completeOnboarding() {
-    isFirstTimeUser = false;
-    notifyListeners();
-  }
-
-  void login(String phone, String name) {
-    userPhone = phone;
-    userName = name;
-    isLoggedIn = true;
-    notifyListeners();
-  }
-
-  void logout() {
-    isLoggedIn = false;
-    notifyListeners();
-  }
+  void completeOnboarding() { isFirstTimeUser = false; notifyListeners(); }
+  void login(String phone, String name) { userPhone = phone; userName = name; isLoggedIn = true; notifyListeners(); }
+  void logout() { isLoggedIn = false; notifyListeners(); }
 
   void addToCart(Product p, {double? customPrice}) {
     final idx = cart.indexWhere((i) => i.product.id == p.id);
-    if (idx >= 0) {
-      cart[idx].quantity++;
-    } else {
-      cart.add(CartItem(product: p, customPrice: customPrice));
-    }
+    if (idx >= 0) { cart[idx].quantity++; } else { cart.add(CartItem(product: p, customPrice: customPrice)); }
     notifyListeners();
   }
 
@@ -236,43 +150,20 @@ class AppState extends ChangeNotifier {
   double get finalPayable => (cartSubtotal - scrapCashback).clamp(0, double.infinity);
 
   void toggleWishlist(Product p) {
-    if (wishlist.any((i) => i.id == p.id)) {
-      wishlist.removeWhere((i) => i.id == p.id);
-    } else {
-      wishlist.add(p);
-    }
+    if (wishlist.any((i) => i.id == p.id)) { wishlist.removeWhere((i) => i.id == p.id); } else { wishlist.add(p); }
     notifyListeners();
   }
 
   bool isWishlisted(String id) => wishlist.any((i) => i.id == id);
 
   void addToTrialKit(Product p) {
-    if (trialKit.length < 4 && !trialKit.any((i) => i.id == p.id)) {
-      trialKit.add(p);
-      notifyListeners();
-    }
+    if (trialKit.length < 4 && !trialKit.any((i) => i.id == p.id)) { trialKit.add(p); notifyListeners(); }
   }
 
-  void removeFromTrialKit(String id) {
-    trialKit.removeWhere((i) => i.id == id);
-    notifyListeners();
-  }
-
-  void setSlot(String date, String slot) {
-    selectedDate = date;
-    selectedSlot = slot;
-    notifyListeners();
-  }
-
-  void applyScrapCashback(double amt) {
-    scrapCashback = amt;
-    notifyListeners();
-  }
-
-  void removeScrapCashback() {
-    scrapCashback = 0.0;
-    notifyListeners();
-  }
+  void removeFromTrialKit(String id) { trialKit.removeWhere((i) => i.id == id); notifyListeners(); }
+  void setSlot(String date, String slot) { selectedDate = date; selectedSlot = slot; notifyListeners(); }
+  void applyScrapCashback(double amt) { scrapCashback = amt; notifyListeners(); }
+  void removeScrapCashback() { scrapCashback = 0.0; notifyListeners(); }
 
   void placeOrder({required bool isTrial}) {
     final id = isTrial ? 'RGTR123456' : 'RGORD123456';
@@ -280,28 +171,20 @@ class AppState extends ChangeNotifier {
     final emoji = isTrial ? '👑' : (cart.isNotEmpty ? cart.first.product.emoji : '💎');
     final amount = isTrial ? trialFee.toDouble() : finalPayable;
 
-    orders.insert(
-      0,
-      OrderItem(orderId: id, productName: name, emoji: emoji, amount: amount, status: 'Order Confirmed', date: 'Today', isTrial: isTrial),
-    );
-    if (!isTrial) {
-      cart.clear();
-      scrapCashback = 0.0;
-    }
+    orders.insert(0, OrderItem(orderId: id, productName: name, emoji: emoji, amount: amount, status: 'Order Confirmed', date: 'Today', isTrial: isTrial));
+    if (!isTrial) { cart.clear(); scrapCashback = 0.0; }
     notifyListeners();
   }
 }
 
+// Global AppState instance
+final appState = AppState();
+
 // ==========================================
-// 🚀 APP ENTRY
+// 🚀 APP ENTRY POINT
 // ==========================================
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AppState())],
-      child: const RoldyGoldyApp(),
-    ),
-  );
+  runApp(const RoldyGoldyApp());
 }
 
 class RoldyGoldyApp extends StatelessWidget {
@@ -309,21 +192,26 @@ class RoldyGoldyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'RoldyGoldy',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: AppColors.ivory,
-        textTheme: GoogleFonts.manropeTextTheme(),
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.ivory,
-          elevation: 0,
-          titleTextStyle: GoogleFonts.cormorantGaramond(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textDark),
-          iconTheme: const IconThemeData(color: AppColors.textDark),
-        ),
-      ),
-      home: const RootDecider(),
+    return AnimatedBuilder(
+      animation: appState,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'RoldyGoldy',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            scaffoldBackgroundColor: AppColors.ivory,
+            fontFamily: 'serif',
+            appBarTheme: const AppBarTheme(
+              backgroundColor: AppColors.ivory,
+              elevation: 0,
+              titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textDark, fontFamily: 'serif'),
+              iconTheme: IconThemeData(color: AppColors.textDark),
+            ),
+          ),
+          home: const RootDecider(),
+        );
+      },
     );
   }
 }
@@ -333,9 +221,8 @@ class RootDecider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-    if (state.isFirstTimeUser) return const SplashScreen();
-    if (!state.isLoggedIn) return const AuthPhoneScreen();
+    if (appState.isFirstTimeUser) return const SplashScreen();
+    if (!appState.isLoggedIn) return const AuthPhoneScreen();
     return const MainNavShell();
   }
 }
@@ -362,8 +249,6 @@ class _MainNavShellState extends State<MainNavShell> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
     final screens = [
       const HomeScreen(),
       const CategoriesScreen(),
@@ -384,8 +269,8 @@ class _MainNavShellState extends State<MainNavShell> {
           const NavigationDestination(icon: Icon(Icons.grid_view_outlined), selectedIcon: Icon(Icons.grid_view, color: AppColors.goldDark), label: 'Categories'),
           NavigationDestination(
             icon: Badge(
-              label: Text('${state.trialKit.length}'),
-              isLabelVisible: state.trialKit.isNotEmpty,
+              label: Text('${appState.trialKit.length}'),
+              isLabelVisible: appState.trialKit.isNotEmpty,
               child: const Icon(Icons.schedule_outlined),
             ),
             selectedIcon: const Icon(Icons.schedule, color: AppColors.goldDark),
@@ -400,7 +285,7 @@ class _MainNavShellState extends State<MainNavShell> {
 }
 
 // ==========================================
-// 📱 01–06: ONBOARDING & AUTH
+// 📱 01–06: ONBOARDING & AUTHENTICATION
 // ==========================================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -421,17 +306,17 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: AppColors.wineDark,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('RoldyGoldy', style: GoogleFonts.cormorantGaramond(fontSize: 38, fontWeight: FontWeight.bold, color: AppColors.goldLight, letterSpacing: 1.5)),
-            const SizedBox(height: 6),
-            const Text('HER PRIDE • HER CHOICE • HER TRUST', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.gold, letterSpacing: 2)),
-            const SizedBox(height: 48),
-            const Text('👑', style: TextStyle(fontSize: 80)),
+            Text('RoldyGoldy', style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold, color: AppColors.goldLight, letterSpacing: 1.5, fontFamily: 'serif')),
+            SizedBox(height: 6),
+            Text('HER PRIDE • HER CHOICE • HER TRUST', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.gold, letterSpacing: 2)),
+            SizedBox(height: 48),
+            Text('👑', style: TextStyle(fontSize: 80)),
           ],
         ),
       ),
@@ -460,7 +345,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: () {
-                  context.read<AppState>().completeOnboarding();
+                  appState.completeOnboarding();
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AuthPhoneScreen()));
                 },
                 child: const Text('Skip', style: TextStyle(color: AppColors.goldLight)),
@@ -499,7 +384,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     if (_page < 2) {
                       _ctrl.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
                     } else {
-                      context.read<AppState>().completeOnboarding();
+                      appState.completeOnboarding();
                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const AuthPhoneScreen()));
                     }
                   },
@@ -513,16 +398,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _slide1() => Padding(
-        padding: const EdgeInsets.all(24),
+  Widget _slide1() => const Padding(
+        padding: EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('✨', style: TextStyle(fontSize: 72)),
-            const SizedBox(height: 24),
-            Text('For Every You,\nFor Every Moment.', textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory)),
-            const SizedBox(height: 10),
-            const Text('From everyday elegance to dreamy bridal looks.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppColors.goldLight)),
+            Text('✨', style: TextStyle(fontSize: 72)),
+            SizedBox(height: 24),
+            Text('For Every You,\nFor Every Moment.', textAlign: TextAlign.center, style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory, fontFamily: 'serif')),
+            SizedBox(height: 10),
+            Text('From everyday elegance to dreamy bridal looks.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: AppColors.goldLight)),
           ],
         ),
       );
@@ -554,7 +439,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Her Choice.\nOur Promise.', textAlign: TextAlign.center, style: GoogleFonts.cormorantGaramond(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory)),
+            const Text('Her Choice.\nOur Promise.', textAlign: TextAlign.center, style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppColors.ivory, fontFamily: 'serif')),
             const SizedBox(height: 20),
             ...['1 Lakh+ Happy Customers', '100% Secure Payments', 'Easy Returns', 'Pan India Delivery'].map(
               (t) => Padding(
@@ -588,7 +473,7 @@ class AuthPhoneScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              Text('Welcome to\nRoldyGoldy', style: GoogleFonts.cormorantGaramond(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textDark)),
+              const Text('Welcome to\nRoldyGoldy', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.textDark, fontFamily: 'serif')),
               const Text('Login / Sign up', style: TextStyle(fontSize: 12, color: AppColors.textMuted)),
               const SizedBox(height: 30),
               const Text('Enter your mobile number', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
@@ -662,7 +547,7 @@ class OtpVerifyScreen extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
                 onPressed: () {
-                  context.read<AppState>().login(phone, 'Meera Sharma');
+                  appState.login(phone, 'Meera Sharma');
                   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const MainNavShell()), (r) => false);
                 },
                 child: const Text('Verify & Continue'),
@@ -683,21 +568,19 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('RoldyGoldy', style: GoogleFonts.cormorantGaramond(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.goldDark)),
+            const Text('RoldyGoldy', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.goldDark, fontFamily: 'serif')),
             Row(
               children: [
                 IconButton(icon: const Icon(Icons.favorite_border), onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WishlistScreen()))),
                 IconButton(
                   icon: Badge(
-                    label: Text('${state.cart.length}'),
-                    isLabelVisible: state.cart.isNotEmpty,
+                    label: Text('${appState.cart.length}'),
+                    isLabelVisible: appState.cart.isNotEmpty,
                     child: const Icon(Icons.shopping_bag_outlined),
                   ),
                   onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen())),
@@ -761,10 +644,10 @@ class HomeScreen extends StatelessWidget {
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: state.products.length,
+              itemCount: appState.products.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.72, crossAxisSpacing: 10, mainAxisSpacing: 10),
               itemBuilder: (context, i) {
-                final p = state.products[i];
+                final p = appState.products[i];
                 return GestureDetector(
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProductDetailScreen(product: p))),
                   child: Card(
@@ -865,16 +748,14 @@ class CategoryListingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
     return Scaffold(
       appBar: AppBar(title: Text(category)),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: state.products.length,
+        itemCount: appState.products.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, childAspectRatio: 0.72, crossAxisSpacing: 10, mainAxisSpacing: 10),
         itemBuilder: (context, i) {
-          final p = state.products[i];
+          final p = appState.products[i];
           return GestureDetector(
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ProductDetailScreen(product: p))),
             child: Card(
@@ -921,9 +802,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
     final p = widget.product;
-    final isWish = state.isWishlisted(p.id);
+    final isWish = appState.isWishlisted(p.id);
 
     return Scaffold(
       appBar: AppBar(
@@ -931,7 +811,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           IconButton(
             icon: Icon(isWish ? Icons.favorite : Icons.favorite_border, color: isWish ? AppColors.ruby : AppColors.textDark),
-            onPressed: () => state.toggleWishlist(p),
+            onPressed: () {
+              setState(() {
+                appState.toggleWishlist(p);
+              });
+            },
           ),
         ],
       ),
@@ -943,7 +827,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  state.addToTrialKit(p);
+                  appState.addToTrialKit(p);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const TrialCartScreen()));
                 },
                 child: const Text('Try @Home'),
@@ -954,7 +838,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.wineDark, foregroundColor: AppColors.goldLight),
                 onPressed: () {
-                  state.addToCart(p, customPrice: _bargainPrice);
+                  appState.addToCart(p, customPrice: _bargainPrice);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
                 },
                 child: const Text('Buy Now'),
@@ -1116,8 +1000,6 @@ class _SelectSlotScreenState extends State<SelectSlotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
     return Scaffold(
       appBar: AppBar(title: const Text('Select Time Slot')),
       body: Padding(
@@ -1140,7 +1022,7 @@ class _SelectSlotScreenState extends State<SelectSlotScreen> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
                 onPressed: () {
-                  state.setSlot('27 May, Tue', _slot);
+                  appState.setSlot('27 May, Tue', _slot);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const TrialCartScreen()));
                 },
                 child: const Text('Continue · Trial Fee ₹99'),
@@ -1158,22 +1040,20 @@ class TrialCartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = context.watch<AppState>();
-
     return Scaffold(
-      appBar: AppBar(title: Text('Trial Cart (${state.trialKit.length}/4)')),
+      appBar: AppBar(title: Text('Trial Cart (${appState.trialKit.length}/4)')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (state.trialKit.isEmpty)
+            if (appState.trialKit.isEmpty)
               const Center(child: Text('No items in trial kit'))
             else
-              ...state.trialKit.map((p) => Card(
+              ...appState.trialKit.map((p) => Card(
                     child: ListTile(
                       leading: Text(p.emoji, style: const TextStyle(fontSize: 22)),
                       title: Text(p.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
-                      trailing: IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 18), onPressed: () => state.removeFromTrialKit(p.id)),
+                      trailing: IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 18), onPressed: () => appState.removeFromTrialKit(p.id)),
                     ),
                   )),
             const Spacer(),
@@ -1181,10 +1061,10 @@ class TrialCartScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
-                onPressed: state.trialKit.isEmpty
+                onPressed: appState.trialKit.isEmpty
                     ? null
                     : () {
-                        state.placeOrder(isTrial: true);
+                        appState.placeOrder(isTrial: true);
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TrialConfirmedScreen()));
                       },
                 child: const Text('Confirm Trial Booking · Pay ₹99'),
@@ -1258,4 +1138,178 @@ class TrialLiveTimerScreen extends StatelessWidget {
 
 // ==========================================
 // ♻️ 17–20: EXCHANGE & SAVE
-// ===
+// ==========================================
+class ExchangeHomeScreen extends StatefulWidget {
+  const ExchangeHomeScreen({super.key});
+
+  @override
+  State<ExchangeHomeScreen> createState() => _ExchangeHomeScreenState();
+}
+
+class _ExchangeHomeScreenState extends State<ExchangeHomeScreen> {
+  String _mat = 'Brass Jewellery';
+  final TextEditingController _ctrl = TextEditingController(text: '100');
+
+  @override
+  Widget build(BuildContext context) {
+    final g = double.tryParse(_ctrl.text) ?? 100;
+    final net = (g * 3.1 * 0.90).roundToDouble();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Exchange & Save')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              color: AppColors.emeraldLight,
+              child: const Padding(
+                padding: EdgeInsets.all(12),
+                child: Text('♻️ Trade in old jewellery for instant cashback applied directly to your cart bill.', style: TextStyle(fontSize: 11, color: AppColors.emerald, height: 1.4)),
+              ),
+            ),
+            const SizedBox(height: 14),
+            const Text('Select Material', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            const SizedBox(height: 6),
+            ...['Brass Jewellery', 'Copper Jewellery', 'Mixed Alloy', 'Broken Scrap'].map(
+              (m) => Card(
+                child: RadioListTile<String>(
+                  value: m,
+                  groupValue: _mat,
+                  onChanged: (v) => setState(() => _mat = v!),
+                  title: Text(m, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: _ctrl,
+              keyboardType: TextInputType.number,
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(labelText: 'Approx Weight (Grams)', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 14),
+            Card(
+              color: AppColors.wineCard,
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Column(
+                  children: [
+                    const Text('ESTIMATED CASHBACK CREDIT', style: TextStyle(color: AppColors.goldLight, fontSize: 9, fontWeight: FontWeight.bold)),
+                    Text('₹${net.toInt()}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.goldLight)),
+                    const Text('Net of 10% purity check deduction', style: TextStyle(color: AppColors.ivory, fontSize: 8)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
+                onPressed: () {
+                  appState.applyScrapCashback(net);
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
+                },
+                child: const Text('Apply Cashback to Cart'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ==========================================
+// 🛒 22–25: CART, CHECKOUT & ORDERS
+// ==========================================
+class CartScreen extends StatelessWidget {
+  const CartScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('My Cart (${appState.cart.length} items)')),
+      body: appState.cart.isEmpty
+          ? const Center(child: Text('Your Cart is Empty'))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  ...appState.cart.map((item) => Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            children: [
+                              Text(item.product.emoji, style: const TextStyle(fontSize: 28)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(item.product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                                    Text('₹${item.unitPrice.toInt()}'),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(icon: const Icon(Icons.remove, size: 16), onPressed: () => appState.updateCartQty(item.product.id, -1)),
+                                  Text('${item.quantity}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  IconButton(icon: const Icon(Icons.add, size: 16), onPressed: () => appState.updateCartQty(item.product.id, 1)),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )),
+                  const SizedBox(height: 10),
+                  Card(
+                    color: appState.scrapCashback > 0 ? AppColors.emeraldLight : AppColors.cardBg,
+                    child: ListTile(
+                      title: Text(
+                        appState.scrapCashback > 0 ? 'Scrap Cashback: -₹${appState.scrapCashback.toInt()}' : 'Have old jewellery to exchange?',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: appState.scrapCashback > 0 ? AppColors.emerald : AppColors.textDark),
+                      ),
+                      trailing: appState.scrapCashback > 0
+                          ? IconButton(icon: const Icon(Icons.close, color: AppColors.ruby, size: 16), onPressed: () => appState.removeScrapCashback())
+                          : const Icon(Icons.arrow_forward_ios, size: 12),
+                      onTap: () => appState.scrapCashback == 0 ? Navigator.push(context, MaterialPageRoute(builder: (_) => const ExchangeHomeScreen())) : null,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          _bRow('Subtotal', '₹${appState.cartSubtotal.toInt()}'),
+                          if (appState.scrapCashback > 0) _bRow('Scrap Cashback', '- ₹${appState.scrapCashback.toInt()}', isGreen: true),
+                          const Divider(),
+                          _bRow('Total Payable', '₹${appState.finalPayable.toInt()}', isBold: true),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.gold, foregroundColor: AppColors.wineDark),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
+                      child: Text('Proceed to Checkout · ₹${appState.finalPayable.toInt()}'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+    );
+  }
+
+  Widget _bRow(String k, String v, {bool isGreen = false, bool isBold = false}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(k, style: TextStyle(fontSize: 11, color: isGreen ? AppColors.emerald : AppColors.textDark, fontWeight: isBold ? FontWeight.bold : FontWeight.normal)),
+          Text(v, style: TextStyle(fontSize: 11, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: isGreen ? AppColors.emerald : AppColo

@@ -26,8 +26,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,7 +42,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -72,7 +69,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-// --- PALETTE & BRAND ---
+// ==========================================
+// 🎨 EXACT LUXURY PALETTE (From App Flow Diagram)
+// ==========================================
 val DarkCanvas = Color(0xFF120C07)
 val DarkCard = Color(0xFF1C130D)
 val DarkSurface = Color(0xFF2B1E15)
@@ -85,12 +84,13 @@ val LightBorder = Color(0xFFEFE8DC)
 val TextDark = Color(0xFF1F1610)
 val TextMuted = Color(0xFF8C7E72)
 val EmeraldSuccess = Color(0xFF1B6B46)
+val EmeraldLight = Color(0xFFE2F4EB)
 val RubyRed = Color(0xFFA62435)
 
 val DarkObsidianGrad = Brush.verticalGradient(listOf(DarkSurface, DarkCard, DarkCanvas))
 
 @Composable
-fun RoldyGoldyLogo(size: Int = 42, showSubtitle: Boolean = false, isDarkBg: Boolean = false) {
+fun RoldyGoldyLogo(size: Int = 38, showSubtitle: Boolean = false, isDarkBg: Boolean = false) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text("RoldyGoldy", fontSize = size.sp, fontWeight = FontWeight.Bold, color = if (isDarkBg) GoldLight else GoldDark, letterSpacing = 1.sp)
         if (showSubtitle) {
@@ -99,7 +99,9 @@ fun RoldyGoldyLogo(size: Int = 42, showSubtitle: Boolean = false, isDarkBg: Bool
     }
 }
 
-// --- DATA MODELS ---
+// ==========================================
+// 📦 DATA MODELS
+// ==========================================
 data class Product(
     val id: String, val name: String, val category: String, val price: Double, val originalPrice: Double,
     val emoji: String, val isTrialEligible: Boolean, val tag: String, val karatInfo: String,
@@ -125,7 +127,9 @@ val sampleAddresses = listOf(
     Address("a2", "Office", "Meera Sharma", "Mindspace, Hitech City, Hyderabad", "500081", 4.1, isDefault = false)
 )
 
-// --- VIEWMODEL ---
+// ==========================================
+// 🧠 VIEWMODEL & STATE
+// ==========================================
 data class AppState(
     val isFirstTimeUser: Boolean = true,
     val isLoggedIn: Boolean = false,
@@ -242,12 +246,12 @@ class MainViewModel : ViewModel() {
     }
 
     fun sendBargainOffer(productId: String, offerAmt: Double) {
-        val userMsg = ChatMessage(System.currentTimeMillis().toString(), "buyer", "I'd like to offer ₹${offerAmt.toInt()} for this piece.", "Just now", true)
+        val userMsg = ChatMessage(System.currentTimeMillis().toString(), "buyer", "Offer: ₹${offerAmt.toInt()}", "Just now", true)
         _state.update { it.copy(chatMessages = it.chatMessages + userMsg) }
         viewModelScope.launch {
             delay(1200)
             val counter = (offerAmt * 1.07).toInt().toDouble()
-            val sellerMsg = ChatMessage((System.currentTimeMillis() + 1).toString(), "seller", "Received your offer on the Vendor Portal! The best discounted price is ₹${counter.toInt()}.", "Just now", true, counter)
+            val sellerMsg = ChatMessage((System.currentTimeMillis() + 1).toString(), "seller", "Vendor Counter: ₹${counter.toInt()}", "Just now", true, counter)
             _state.update { it.copy(chatMessages = it.chatMessages + sellerMsg) }
         }
     }
@@ -293,37 +297,39 @@ class MainViewModel : ViewModel() {
     }
 }
 
-// --- NAVIGATION ROUTER ---
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    data object Splash : Screen("splash", "Splash", Icons.Default.Star)
-    data object Onboarding1 : Screen("onboarding1", "Onboarding 1", Icons.Default.Star)
-    data object Onboarding2 : Screen("onboarding2", "Onboarding 2", Icons.Default.Star)
-    data object Onboarding3 : Screen("onboarding3", "Onboarding 3", Icons.Default.Star)
-    data object AuthPhone : Screen("auth_phone", "Login", Icons.Default.Lock)
-    data object OtpVerify : Screen("otp_verify", "Verify OTP", Icons.Default.Lock)
-    data object Home : Screen("home", "Home", Icons.Default.Home)
-    data object Categories : Screen("categories", "Categories", Icons.Default.GridView)
-    data object CategoryListing : Screen("cat_listing/{catName}", "Collections", Icons.Default.GridView) { fun create(c: String) = "cat_listing/$c" }
-    data object ProductDetail : Screen("pdp/{productId}", "Product Detail", Icons.Default.Home) { fun create(id: String) = "pdp/$id" }
-    data object TryAtHomeInfo : Screen("trial_info", "Trial", Icons.Default.Schedule)
-    data object SelectSlot : Screen("select_slot", "Select Slot", Icons.Default.Schedule)
-    data object TrialCart : Screen("trial_cart", "Trial Cart", Icons.Default.Schedule)
-    data object TrialAddress : Screen("trial_address", "Delivery Address", Icons.Default.Place)
-    data object TrialConfirmed : Screen("trial_confirmed", "Trial Confirmed", Icons.Default.CheckCircle)
-    data object ExchangeHome : Screen("exchange_home", "Exchange", Icons.Default.Cached)
-    data object ExchangeQuoteScreen : Screen("exchange_quote", "Your Quote", Icons.Default.Cached)
-    data object ExchangeConfirmed : Screen("exchange_confirmed", "Exchange Confirmed", Icons.Default.CheckCircle)
-    data object Cart : Screen("cart", "My Cart", Icons.Default.ShoppingCart)
-    data object Checkout : Screen("checkout", "Checkout", Icons.Default.CreditCard)
-    data object OrderConfirmed : Screen("order_confirmed", "Order Confirmed", Icons.Default.CheckCircle)
-    data object OrderTracking : Screen("order_tracking", "Track Order", Icons.Default.LocalShipping)
-    data object TrialExperienceLive : Screen("trial_live", "Trial Live", Icons.Default.Schedule)
-    data object ReturnsAfterTrial : Screen("trial_returns", "Return Items", Icons.Default.AssignmentReturn)
-    data object Profile : Screen("profile", "Account", Icons.Default.Person)
-    data object Wishlist : Screen("wishlist", "Wishlist", Icons.Default.Favorite)
-    data object HelpSupport : Screen("help_support", "Help & Support", Icons.Default.HeadsetMic)
-    data object VirtualTryOn : Screen("vto", "3D Mirror", Icons.Default.CameraAlt)
-    data object SellerChat : Screen("chat/{productId}", "Chat", Icons.Default.Chat) { fun create(pId: String) = "chat/$pId" }
+// ==========================================
+// 🚀 NAVIGATION ROUTER & APP SHELL
+// ==========================================
+sealed class Screen(val route: String, val title: String) {
+    data object Splash : Screen("splash", "Splash")
+    data object Onboarding1 : Screen("onboarding1", "Onboarding 1")
+    data object Onboarding2 : Screen("onboarding2", "Onboarding 2")
+    data object Onboarding3 : Screen("onboarding3", "Onboarding 3")
+    data object AuthPhone : Screen("auth_phone", "Login")
+    data object OtpVerify : Screen("otp_verify", "Verify OTP")
+    data object Home : Screen("home", "Home")
+    data object Categories : Screen("categories", "Categories")
+    data object CategoryListing : Screen("cat_listing/{catName}", "Collections") { fun create(c: String) = "cat_listing/$c" }
+    data object ProductDetail : Screen("pdp/{productId}", "Product Detail") { fun create(id: String) = "pdp/$id" }
+    data object TryAtHomeInfo : Screen("trial_info", "Trial")
+    data object SelectSlot : Screen("select_slot", "Select Slot")
+    data object TrialCart : Screen("trial_cart", "Trial Cart")
+    data object TrialAddress : Screen("trial_address", "Delivery Address")
+    data object TrialConfirmed : Screen("trial_confirmed", "Trial Confirmed")
+    data object ExchangeHome : Screen("exchange_home", "Exchange")
+    data object ExchangeQuoteScreen : Screen("exchange_quote", "Your Quote")
+    data object ExchangeConfirmed : Screen("exchange_confirmed", "Exchange Confirmed")
+    data object Cart : Screen("cart", "My Cart")
+    data object Checkout : Screen("checkout", "Checkout")
+    data object OrderConfirmed : Screen("order_confirmed", "Order Confirmed")
+    data object OrderTracking : Screen("order_tracking", "Track Order")
+    data object TrialExperienceLive : Screen("trial_live", "Trial Live")
+    data object ReturnsAfterTrial : Screen("trial_returns", "Return Items")
+    data object Profile : Screen("profile", "Account")
+    data object Wishlist : Screen("wishlist", "Wishlist")
+    data object HelpSupport : Screen("help_support", "Help & Support")
+    data object VirtualTryOn : Screen("vto", "3D Mirror")
+    data object SellerChat : Screen("chat/{productId}", "Chat") { fun create(pId: String) = "chat/$pId" }
 }
 
 class MainActivity : ComponentActivity() {
@@ -358,14 +364,21 @@ fun AppNavigator(vm: MainViewModel = viewModel()) {
                 NavigationBar(containerColor = LightCard, tonalElevation = 8.dp, modifier = Modifier.border(1.dp, LightBorder)) {
                     topNavTabs.forEach { screen ->
                         val isSelected = currentRoute == screen.route
+                        val icon = when(screen) {
+                            Screen.Home -> Icons.Default.Home
+                            Screen.Categories -> Icons.Default.Menu
+                            Screen.TryAtHomeInfo -> Icons.Default.DateRange
+                            Screen.ExchangeHome -> Icons.Default.Refresh
+                            else -> Icons.Default.Person
+                        }
                         NavigationBarItem(
                             icon = {
                                 if (screen == Screen.TryAtHomeInfo && state.trialKit.isNotEmpty()) {
                                     BadgedBox(badge = { Badge(containerColor = GoldPrimary) { Text("${state.trialKit.size}", color = DarkCanvas) } }) {
-                                        Icon(screen.icon, contentDescription = screen.title)
+                                        Icon(icon, contentDescription = screen.title)
                                     }
                                 } else {
-                                    Icon(screen.icon, contentDescription = screen.title)
+                                    Icon(icon, contentDescription = screen.title)
                                 }
                             },
                             label = { Text(screen.title, fontSize = 10.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium) },
@@ -432,3 +445,900 @@ fun AppNavigator(vm: MainViewModel = viewModel()) {
         }
     }
 }
+
+// ==========================================
+// 📱 SCREEN COMPOSABLES (01 TO 30)
+// ==========================================
+
+// --- 01. SPLASH ---
+@Composable
+fun SplashScreen(onFinish: () -> Unit) {
+    LaunchedEffect(Unit) { delay(2400); onFinish() }
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            RoldyGoldyLogo(size = 38, showSubtitle = true, isDarkBg = true)
+            Spacer(modifier = Modifier.height(48.dp))
+            Box(modifier = Modifier.size(160.dp).clip(CircleShape).background(GoldPrimary.copy(alpha = 0.12f)).border(2.dp, GoldPrimary.copy(alpha = 0.4f), CircleShape), contentAlignment = Alignment.Center) {
+                Text("👑", fontSize = 84.sp)
+            }
+        }
+    }
+}
+
+// --- 02. ONBOARDING 1 ---
+@Composable
+fun OnboardingScreen1(onNext: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(modifier = Modifier.size(190.dp).clip(RoundedCornerShape(24.dp)).background(GoldPrimary.copy(alpha = 0.15f)).border(1.5.dp, GoldPrimary, RoundedCornerShape(24.dp)), contentAlignment = Alignment.Center) {
+                Text("✨", fontSize = 84.sp)
+            }
+            Spacer(modifier = Modifier.height(28.dp))
+            Text("For Every You,\nFor Every Moment.", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = LightCanvas, textAlign = TextAlign.Center, lineHeight = 30.sp)
+            Spacer(modifier = Modifier.height(10.dp))
+            Text("From everyday elegance to dreamy bridal looks.", fontSize = 12.sp, color = GoldLight.copy(alpha = 0.85f), textAlign = TextAlign.Center)
+        }
+        Button(onClick = onNext, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)) {
+            Text("Next", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+    }
+}
+
+// --- 03. ONBOARDING 2 ---
+@Composable
+fun OnboardingScreen2(onNext: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            OnboardingCard("👑", "Try at Home", "Book your favorite jewellery & try 3–4 pieces at home.")
+            Spacer(modifier = Modifier.height(12.dp))
+            OnboardingCard("♻️", "Exchange & Save", "Exchange your old jewellery and get instant cashback.")
+            Spacer(modifier = Modifier.height(12.dp))
+            OnboardingCard("🛡️", "Trusted Quality", "Premium imitation jewellery with 6 months warranty.")
+        }
+        Button(onClick = onNext, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)) {
+            Text("Next", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+    }
+}
+
+@Composable
+fun OnboardingCard(icon: String, title: String, desc: String) {
+    Card(colors = CardDefaults.cardColors(containerColor = DarkCard), border = BorderStroke(1.dp, GoldPrimary.copy(alpha = 0.35f)), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(icon, fontSize = 26.sp)
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = GoldLight)
+                Text(desc, fontSize = 11.sp, color = LightCanvas.copy(alpha = 0.8f), lineHeight = 15.sp)
+            }
+        }
+    }
+}
+
+// --- 04. ONBOARDING 3 ---
+@Composable
+fun OnboardingScreen3(onGetStarted: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Her Choice.\nOur Promise.", fontSize = 26.sp, fontWeight = FontWeight.Bold, color = LightCanvas, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(24.dp))
+            PromiseRow("1 Lakh+ Happy Customers")
+            PromiseRow("Secure Payments")
+            PromiseRow("Easy Returns")
+            PromiseRow("Pan India Delivery")
+        }
+        Button(onClick = onGetStarted, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)) {
+            Text("Get Started", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        }
+    }
+}
+
+@Composable
+fun PromiseRow(text: String) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = GoldPrimary, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = LightCanvas)
+    }
+}
+
+// --- 05. AUTH - PHONE ---
+@Composable
+fun AuthPhoneScreen(onContinue: (String) -> Unit) {
+    var phoneInput by remember { mutableStateOf("98765 43210") }
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(24.dp)) {
+        Spacer(modifier = Modifier.height(24.dp))
+        Text("Welcome to\nRoldyGoldy", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = TextDark)
+        Text("Login / Sign up", fontSize = 12.sp, color = TextMuted)
+        Spacer(modifier = Modifier.height(30.dp))
+        Text("Enter your mobile number", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark)
+        Spacer(modifier = Modifier.height(6.dp))
+        Row(modifier = Modifier.fillMaxWidth().border(1.dp, LightBorder, RoundedCornerShape(10.dp)).background(LightCard).padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("+91", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextDark)
+            Spacer(modifier = Modifier.width(12.dp))
+            Box(modifier = Modifier.weight(1f)) { Text(phoneInput, fontSize = 13.sp, color = TextDark, fontWeight = FontWeight.SemiBold) }
+        }
+        Spacer(modifier = Modifier.height(18.dp))
+        Button(onClick = { onContinue(phoneInput) }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("Continue", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Text("or continue with", fontSize = 11.sp, color = TextMuted) }
+        Spacer(modifier = Modifier.height(14.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            SocialBtn("G"); Spacer(modifier = Modifier.width(12.dp)); SocialBtn("f"); Spacer(modifier = Modifier.width(12.dp)); SocialBtn("")
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Text("By continuing, you agree to our\nTerms & Conditions & Privacy Policy", fontSize = 10.sp, color = TextMuted, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Composable
+fun SocialBtn(label: String) {
+    Box(modifier = Modifier.size(42.dp).clip(CircleShape).background(LightCard).border(1.dp, LightBorder, CircleShape), contentAlignment = Alignment.Center) {
+        Text(label, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+    }
+}
+
+// --- 06. OTP VERIFICATION ---
+@Composable
+fun OtpVerifyScreen(phone: String, onVerified: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(24.dp)) {
+        Spacer(modifier = Modifier.height(20.dp))
+        Text("Verify OTP", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextDark)
+        Text("Enter the 6 digit code sent to\n$phone", fontSize = 12.sp, color = TextMuted, lineHeight = 16.sp)
+        Spacer(modifier = Modifier.height(26.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            listOf("2", "4", "6", "8", "1", "1").forEach { digit ->
+                Box(modifier = Modifier.size(42.dp).border(1.dp, GoldPrimary, RoundedCornerShape(8.dp)).background(LightCard), contentAlignment = Alignment.Center) {
+                    Text(digit, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = TextDark)
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Text("Resend OTP in 00:28", fontSize = 11.sp, color = TextMuted) }
+        Spacer(modifier = Modifier.weight(1f))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Text("Auto detecting OTP 246811 ✓", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Button(onClick = onVerified, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            Text("Verify & Continue", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+        }
+    }
+}
+
+// --- 07. HOME ---
+@Composable
+fun HomeScreen(vm: MainViewModel, onOpenPdp: (String) -> Unit, onOpenTrial: () -> Unit, onOpenCart: () -> Unit, onOpenWishlist: () -> Unit, onOpenCategories: () -> Unit, onOpenVto: () -> Unit) {
+    val state by vm.state.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).verticalScroll(rememberScrollState())) {
+        Surface(color = LightCard, shadowElevation = 1.dp) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    RoldyGoldyLogo(size = 20, showSubtitle = false, isDarkBg = false)
+                    Row {
+                        IconButton(onClick = onOpenWishlist) { Icon(Icons.Default.FavoriteBorder, contentDescription = "Wishlist", tint = TextDark) }
+                        IconButton(onClick = onOpenCart) {
+                            BadgedBox(badge = { if (state.cart.isNotEmpty()) Badge(containerColor = GoldPrimary) { Text("${state.cart.size}", color = DarkCanvas) } }) {
+                                Icon(Icons.Default.ShoppingCart, contentDescription = "Cart", tint = TextDark)
+                            }
+                        }
+                    }
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("Deliver to ", fontSize = 10.sp, color = TextMuted)
+                        Text(state.selectedPincode, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                    }
+                    Row {
+                        IconButton(onClick = {}, modifier = Modifier.size(24.dp)) { Icon(Icons.Default.Search, contentDescription = "Search", tint = TextDark, modifier = Modifier.size(18.dp)) }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        IconButton(onClick = onOpenVto, modifier = Modifier.size(24.dp)) { Icon(Icons.Default.Star, contentDescription = "AR", tint = GoldDark, modifier = Modifier.size(18.dp)) }
+                    }
+                }
+            }
+        }
+
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, GoldPrimary.copy(alpha = 0.5f)), shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Trial @Home", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextDark)
+                    Text("Try up to 4 pieces\nat your doorstep", fontSize = 11.sp, color = TextMuted, lineHeight = 15.sp)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(onClick = onOpenTrial, colors = ButtonDefaults.buttonColors(containerColor = DarkCanvas), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp), shape = RoundedCornerShape(6.dp), modifier = Modifier.height(28.dp)) {
+                        Text("BOOK NOW", fontSize = 10.sp, color = GoldLight, fontWeight = FontWeight.Bold)
+                    }
+                }
+                Box(modifier = Modifier.size(68.dp).clip(RoundedCornerShape(10.dp)).background(GoldLight.copy(alpha = 0.25f)), contentAlignment = Alignment.Center) {
+                    Text("👑", fontSize = 36.sp)
+                }
+            }
+        }
+
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            HomeCatCircle("Daily Wear", "💫") { onOpenCategories() }
+            HomeCatCircle("Korean", "✨") { onOpenCategories() }
+            HomeCatCircle("Temple", "🪔") { onOpenCategories() }
+            HomeCatCircle("Bridal", "👑") { onOpenCategories() }
+            HomeCatCircle("New In", "💍") { onOpenCategories() }
+        }
+
+        Spacer(modifier = Modifier.height(18.dp))
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text("Best Sellers", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextDark)
+            Text("See All", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = GoldDark, modifier = Modifier.clickable { onOpenCategories() })
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            sampleProducts.take(2).forEach { p ->
+                Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), shape = RoundedCornerShape(10.dp), modifier = Modifier.weight(1f).clickable { onOpenPdp(p.id) }) {
+                    Column {
+                        Box(modifier = Modifier.fillMaxWidth().height(105.dp).background(LightCanvas), contentAlignment = Alignment.Center) {
+                            Text(p.emoji, fontSize = 42.sp)
+                        }
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Text(p.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 1)
+                            Text("₹${p.price.toInt()}", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun HomeCatCircle(title: String, icon: String, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onClick() }) {
+        Box(modifier = Modifier.size(44.dp).clip(CircleShape).background(LightCard).border(1.dp, LightBorder, CircleShape), contentAlignment = Alignment.Center) {
+            Text(icon, fontSize = 20.sp)
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(title, fontSize = 9.5.sp, fontWeight = FontWeight.Medium, color = TextDark)
+    }
+}
+
+// --- 08. CATEGORIES ---
+@Composable
+fun CategoriesScreen(onSelectCategory: (String) -> Unit) {
+    val categories = listOf("Daily Wear" to "💫", "Korean" to "✨", "Temple" to "🪔", "Bridal" to "👑", "Necklaces" to "📿", "Earrings" to "💎", "Bangles" to "⭕", "Rings" to "💍", "Mangalsutra" to "🖤", "Sets" to "🎁", "Anklets" to "🦶", "Accessories" to "🪞")
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas)) {
+        Surface(color = LightCard, shadowElevation = 1.dp) {
+            Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) { Text("Categories", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextDark) }
+        }
+        LazyVerticalGrid(columns = GridCells.Fixed(3), contentPadding = PaddingValues(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(categories) { (cat, emoji) ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onSelectCategory(cat) }) {
+                    Box(modifier = Modifier.size(60.dp).clip(CircleShape).background(LightCard).border(1.dp, GoldPrimary.copy(alpha = 0.4f), CircleShape), contentAlignment = Alignment.Center) {
+                        Text(emoji, fontSize = 26.sp)
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(cat, fontSize = 10.5.sp, fontWeight = FontWeight.SemiBold, color = TextDark, textAlign = TextAlign.Center)
+                }
+            }
+        }
+    }
+}
+
+// --- 09. CATEGORY LISTING ---
+@Composable
+fun CategoryListingScreen(catName: String, vm: MainViewModel, onBack: () -> Unit, onOpenPdp: (String) -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas)) {
+        Surface(color = LightCard, shadowElevation = 1.dp) {
+            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark) }
+                Text(catName, fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+            }
+        }
+        LazyVerticalGrid(columns = GridCells.Fixed(2), contentPadding = PaddingValues(16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(state.products) { p ->
+                Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), shape = RoundedCornerShape(10.dp), modifier = Modifier.clickable { onOpenPdp(p.id) }) {
+                    Column {
+                        Box(modifier = Modifier.fillMaxWidth().height(110.dp).background(LightCanvas), contentAlignment = Alignment.Center) {
+                            Text(p.emoji, fontSize = 44.sp)
+                            Surface(color = GoldPrimary, shape = RoundedCornerShape(4.dp), modifier = Modifier.align(Alignment.TopStart).padding(6.dp)) {
+                                Text(p.tag, fontSize = 8.sp, fontWeight = FontWeight.Bold, color = DarkCanvas, modifier = Modifier.padding(4.dp, 2.dp))
+                            }
+                        }
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Text(p.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 1)
+                            Text("₹${p.price.toInt()}", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- 10. PRODUCT DETAIL (PDP) ---
+@Composable
+fun ProductDetailScreen(product: Product, vm: MainViewModel, onBack: () -> Unit, onTryAtHome: () -> Unit, onBuyNow: () -> Unit, onOpenChat: () -> Unit, onOpenVto: () -> Unit) {
+    val isWish = vm.isWishlisted(product.id)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark) } },
+                actions = {
+                    IconButton(onClick = { vm.toggleWishlist(product) }) {
+                        Icon(if (isWish) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = "Wishlist", tint = if (isWish) RubyRed else TextDark)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightCanvas)
+            )
+        },
+        bottomBar = {
+            Surface(color = LightCard, shadowElevation = 8.dp) {
+                Row(modifier = Modifier.fillMaxWidth().padding(14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedButton(onClick = onTryAtHome, modifier = Modifier.weight(1f).height(44.dp), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldDark)) {
+                        Text("Try @Home", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                    Button(onClick = onBuyNow, modifier = Modifier.weight(1f).height(44.dp), shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(containerColor = DarkCanvas)) {
+                        Text("Buy Now", color = GoldLight, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+    ) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding).background(LightCanvas).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().height(220.dp).background(LightCard, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+                Text(product.emoji, fontSize = 80.sp)
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(product.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+                Text("₹${product.price.toInt()}", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("₹${product.originalPrice.toInt()}", fontSize = 12.sp, color = TextMuted, textDecoration = TextDecoration.LineThrough)
+            }
+            Text("Inclusive of all taxes", fontSize = 10.sp, color = TextMuted)
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                PdpPill("Premium Quality"); PdpPill("Skin Friendly"); PdpPill("6 Months Warranty")
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = onOpenVto, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(8.dp)) {
+                    Text("✨ 3D Mirror", fontSize = 11.sp, color = DarkCanvas, fontWeight = FontWeight.Bold)
+                }
+                OutlinedButton(onClick = onOpenChat, modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, DarkCanvas)) {
+                    Text("💬 Bargain Chat", fontSize = 11.sp, color = DarkCanvas, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PdpPill(text: String) {
+    Surface(color = LightCard, shape = RoundedCornerShape(6.dp), border = BorderStroke(1.dp, LightBorder)) {
+        Text(text, fontSize = 9.sp, fontWeight = FontWeight.Medium, color = TextDark, modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp))
+    }
+}
+
+// --- 11. TRY @HOME INFO ---
+@Composable
+fun TryAtHomeInfoScreen(onBookTrial: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Text("Trial @Home", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextDark)
+        Spacer(modifier = Modifier.height(12.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(14.dp)) {
+                Text("How it works?", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = TextDark)
+                Spacer(modifier = Modifier.height(8.dp))
+                TrialStepRow("1", "Book", "Select 3-4 jewellery pieces and choose time slot.")
+                TrialStepRow("2", "Try", "We deliver at your doorstep. Try for 20-30 minutes.")
+                TrialStepRow("3", "Decide", "Buy what you love. Return the rest.")
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text("Trial Fee (Nominal)", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                Text("₹99 per slot (Adjustable on purchase)", fontSize = 10.sp, color = TextMuted)
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = onBookTrial, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Book Trial", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+fun TrialStepRow(num: String, title: String, desc: String) {
+    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+        Box(modifier = Modifier.size(18.dp).clip(CircleShape).background(GoldPrimary), contentAlignment = Alignment.Center) {
+            Text(num, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = DarkCanvas)
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Column {
+            Text(title, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+            Text(desc, fontSize = 10.sp, color = TextMuted)
+        }
+    }
+}
+
+// --- 12. SELECT TIME SLOT ---
+@Composable
+fun SelectTimeSlotScreen(vm: MainViewModel, onBack: () -> Unit, onContinue: () -> Unit) {
+    val days = listOf("26", "27", "28", "29", "30")
+    val slots = listOf("Morning (07:00 AM - 09:00 AM)", "Late Morning (09:00 AM - 12:00 PM)", "Afternoon (12:00 PM - 04:00 PM)", "Evening (04:00 PM - 07:00 PM)", "Night (07:00 PM - 09:00 PM)")
+
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Select Time Slot", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            days.forEach { d ->
+                val isSel = d == "27"
+                Box(modifier = Modifier.size(44.dp).clip(RoundedCornerShape(8.dp)).background(if (isSel) GoldPrimary else LightCard).border(1.dp, if (isSel) GoldPrimary else LightBorder, RoundedCornerShape(8.dp)), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("May", fontSize = 8.sp, color = if (isSel) DarkCanvas else TextMuted)
+                        Text(d, fontWeight = FontWeight.Bold, fontSize = 12.sp, color = if (isSel) DarkCanvas else TextDark)
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        slots.forEach { s ->
+            val isSel = s.startsWith("Evening")
+            Card(colors = CardDefaults.cardColors(containerColor = if (isSel) GoldLight.copy(alpha = 0.3f) else LightCard), border = BorderStroke(1.dp, if (isSel) GoldPrimary else LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+                Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(s, fontSize = 10.5.sp, color = TextDark, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
+                    RadioButton(selected = isSel, onClick = { vm.setSlot("27 May, Tue", s) }, colors = RadioButtonDefaults.colors(selectedColor = GoldDark))
+                }
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Continue (Trial Fee ₹99)", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 13. TRIAL CART ---
+@Composable
+fun TrialCartScreen(vm: MainViewModel, onBack: () -> Unit, onProceedToAddress: () -> Unit, onAddMore: () -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Trial Cart (${state.trialKit.size}/4)", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Text("You can try up to 4 items", fontSize = 10.sp, color = TextMuted)
+        Spacer(modifier = Modifier.height(8.dp))
+        state.trialKit.forEach { p ->
+            Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+                Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(p.emoji, fontSize = 22.sp); Spacer(modifier = Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(p.name, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                        Text("₹${p.price.toInt()}", fontSize = 10.sp, color = TextMuted)
+                    }
+                    IconButton(onClick = { vm.removeProductFromTrialKit(p.id) }) { Icon(Icons.Default.Close, contentDescription = "X", tint = RubyRed, modifier = Modifier.size(16.dp)) }
+                }
+            }
+        }
+        TextButton(onClick = onAddMore) { Text("+ Add More", color = GoldDark, fontWeight = FontWeight.Bold, fontSize = 11.sp) }
+        Spacer(modifier = Modifier.weight(1f))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Trial Fee (Adjustable)", fontSize = 11.sp, color = TextMuted); Text("₹99", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onProceedToAddress, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Proceed to Address", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 15. TRIAL ADDRESS ---
+@Composable
+fun TrialAddressScreen(vm: MainViewModel, onBack: () -> Unit, onContinue: () -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Select Delivery Address", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        state.addresses.forEach { addr ->
+            val isSel = state.selectedAddress.id == addr.id
+            Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, if (isSel) GoldPrimary else LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).clickable { vm.selectAddress(addr) }) {
+                Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = isSel, onClick = { vm.selectAddress(addr) }, colors = RadioButtonDefaults.colors(selectedColor = GoldDark))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(addr.label, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                        Text(addr.addressLine, fontSize = 10.sp, color = TextMuted)
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Text("Delivering within 15 km · Trial available in your area", fontSize = 10.sp, color = EmeraldSuccess, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Continue", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 16. TRIAL CONFIRMED ---
+@Composable
+fun TrialConfirmedScreen(vm: MainViewModel, onViewBooking: () -> Unit, onContinueShopping: () -> Unit) {
+    val state by vm.state.collectAsState()
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            RoldyGoldyLogo(size = 26, isDarkBg = true)
+            Spacer(modifier = Modifier.height(24.dp))
+            Box(modifier = Modifier.size(64.dp).clip(CircleShape).background(GoldPrimary), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = DarkCanvas, modifier = Modifier.size(36.dp))
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Trial Booked!", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = LightCanvas)
+            Text("We will deliver on ${state.selectedDate}\n04:00 PM - 07:00 PM", fontSize = 11.sp, color = GoldLight, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(10.dp))
+            Surface(color = DarkCard, shape = RoundedCornerShape(6.dp)) {
+                Text("Booking ID: RGTR123456", fontSize = 9.5.sp, color = GoldLight, modifier = Modifier.padding(8.dp, 3.dp))
+            }
+        }
+        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+            Button(onClick = onViewBooking, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth().height(44.dp)) {
+                Text("View Booking", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedButton(onClick = onContinueShopping, shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldPrimary), modifier = Modifier.fillMaxWidth().height(44.dp)) {
+                Text("Continue Shopping", color = GoldLight, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+// --- 17. EXCHANGE HOME ---
+@Composable
+fun ExchangeHomeScreen(vm: MainViewModel, onGetQuote: () -> Unit) {
+    var selectedMat by remember { mutableStateOf("Brass Jewellery") }
+    val materials = listOf("Brass Jewellery", "Copper Jewellery", "Mixed Alloy", "Glass Kundan", "Faded Polish Jewellery", "Broken / Scrap Lot")
+
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).verticalScroll(rememberScrollState()).padding(16.dp)) {
+        Text("Exchange & Save", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextDark)
+        Text("Turn your old jewellery into instant savings", fontSize = 11.sp, color = TextMuted)
+        Spacer(modifier = Modifier.height(10.dp))
+        materials.forEach { m ->
+            val isSel = selectedMat == m
+            Card(colors = CardDefaults.cardColors(containerColor = if (isSel) GoldLight.copy(alpha = 0.3f) else LightCard), border = BorderStroke(1.dp, if (isSel) GoldPrimary else LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).clickable { selectedMat = m }) {
+                Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("🪙", fontSize = 14.sp); Spacer(modifier = Modifier.width(8.dp))
+                    Text(m, fontSize = 11.sp, color = TextDark, modifier = Modifier.weight(1f))
+                    RadioButton(selected = isSel, onClick = { selectedMat = m }, colors = RadioButtonDefaults.colors(selectedColor = GoldDark))
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        Button(onClick = { vm.applyExchange(selectedMat, "Old Scrap", 100.0); onGetQuote() }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Upload & Get Quote", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 19. EXCHANGE QUOTE ---
+@Composable
+fun ExchangeQuoteScreen(vm: MainViewModel, onBack: () -> Unit, onProceed: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Your Scrap Quote", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Estimated Value", fontSize = 11.sp, color = TextMuted)
+                Text("₹ 280", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                Text("(After quality check)", fontSize = 10.sp, color = TextMuted)
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = onProceed, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Proceed to Exchange", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 20. EXCHANGE CONFIRMED ---
+@Composable
+fun ExchangeConfirmedScreen(onTrackExchange: () -> Unit, onContinueShopping: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(modifier = Modifier.size(60.dp).clip(CircleShape).background(GoldPrimary), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = DarkCanvas, modifier = Modifier.size(34.dp))
+            }
+            Spacer(modifier = Modifier.height(14.dp))
+            Text("Exchange Confirmed!", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = LightCanvas)
+            Text("Pickup on 27 May, Tue\nExchange ID: ROEX123456", fontSize = 10.sp, color = GoldLight, textAlign = TextAlign.Center)
+        }
+        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+            Button(onClick = onTrackExchange, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth().height(44.dp)) {
+                Text("Track Exchange", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedButton(onClick = onContinueShopping, shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldPrimary), modifier = Modifier.fillMaxWidth().height(44.dp)) {
+                Text("Continue Shopping", color = GoldLight, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+// --- 22. CART ---
+@Composable
+fun CartScreen(vm: MainViewModel, onBack: () -> Unit, onProceedCheckout: () -> Unit, onContinueShopping: () -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("My Cart (${state.cart.size} items)", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        state.cart.forEach { item ->
+            Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+                Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(item.product.emoji, fontSize = 24.sp); Spacer(modifier = Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(item.product.name, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                        Text("₹${item.product.price.toInt()}", fontSize = 10.sp, color = TextMuted)
+                    }
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier.padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Scrap Cashback Applied", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
+                Text("- ₹280", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Total", fontSize = 12.sp, fontWeight = FontWeight.Bold); Text("₹4,518", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Button(onClick = onProceedCheckout, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Proceed to Checkout", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 23. CHECKOUT ---
+@Composable
+fun CheckoutScreen(vm: MainViewModel, onBack: () -> Unit, onPlaceOrder: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Checkout", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text("Address: 21-1-564, Lakdi Ka Pul, Hyderabad...", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            }
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(10.dp)) {
+                Text("Payment: UPI - Google Pay", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = onPlaceOrder, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Place Order", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 24. ORDER CONFIRMED ---
+@Composable
+fun OrderConfirmedScreen(onViewOrder: () -> Unit, onContinueShopping: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(modifier = Modifier.size(60.dp).clip(CircleShape).background(GoldPrimary), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = DarkCanvas, modifier = Modifier.size(34.dp))
+            }
+            Spacer(modifier = Modifier.height(14.dp))
+            Text("Order Confirmed!", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = LightCanvas)
+            Text("Order ID: RGORD123456", fontSize = 10.sp, color = GoldLight)
+        }
+        Column(modifier = Modifier.align(Alignment.BottomCenter)) {
+            Button(onClick = onViewOrder, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(8.dp), modifier = Modifier.fillMaxWidth().height(44.dp)) {
+                Text("View Order", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedButton(onClick = onContinueShopping, shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldPrimary), modifier = Modifier.fillMaxWidth().height(44.dp)) {
+                Text("Continue Shopping", color = GoldLight, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+        }
+    }
+}
+
+// --- 25. ORDER TRACKING ---
+@Composable
+fun OrderTrackingScreen(vm: MainViewModel, onBack: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Track Order (RGORD123456)", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        TrackStep("Order Confirmed", "28 May", true)
+        TrackStep("Packed", "27 May", true)
+        TrackStep("Shipped", "28 May", true)
+        TrackStep("Out for Delivery", "29 May", true)
+        TrackStep("Delivered", "29 May", false)
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = {}, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Call Rider", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+@Composable
+fun TrackStep(title: String, date: String, isDone: Boolean) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(if (isDone) EmeraldSuccess else TextMuted.copy(0.3f)))
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(title, fontSize = 11.sp, color = TextDark, modifier = Modifier.weight(1f))
+        Text(date, fontSize = 9.sp, color = TextMuted)
+    }
+}
+
+// --- 26. TRIAL LIVE ---
+@Composable
+fun TrialExperienceLiveScreen(onBuyNow: () -> Unit, onReturnAll: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
+        Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Your Trial is Live", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = LightCanvas)
+            Spacer(modifier = Modifier.height(20.dp))
+            Text("25:48", fontSize = 42.sp, fontWeight = FontWeight.Bold, color = GoldLight)
+            Text("Time Remaining", fontSize = 10.sp, color = TextMuted)
+        }
+        Row(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onBuyNow, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(8.dp), modifier = Modifier.weight(1f).height(44.dp)) {
+                Text("Buy Now", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            }
+            Button(onClick = onReturnAll, colors = ButtonDefaults.buttonColors(containerColor = DarkCard), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldPrimary), modifier = Modifier.weight(1f).height(44.dp)) {
+                Text("Return All", color = GoldLight, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            }
+        }
+    }
+}
+
+// --- 27. RETURNS AFTER TRIAL ---
+@Composable
+fun ReturnsAfterTrialScreen(vm: MainViewModel, onBack: () -> Unit, onRequestPickup: () -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Return Items", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        state.trialKit.take(2).forEach { p ->
+            Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
+                Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(p.emoji, fontSize = 20.sp); Spacer(modifier = Modifier.width(8.dp))
+                    Text(p.name, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark, modifier = Modifier.weight(1f))
+                    Checkbox(checked = true, onCheckedChange = {})
+                }
+            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = onRequestPickup, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
+            Text("Request Pickup", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+        }
+    }
+}
+
+// --- 28. PROFILE ---
+@Composable
+fun ProfileScreen(vm: MainViewModel, onOpenOrders: () -> Unit, onOpenTrials: () -> Unit, onOpenExchanges: () -> Unit, onOpenWishlist: () -> Unit, onOpenSupport: () -> Unit, onLogout: () -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.size(44.dp).clip(CircleShape).background(GoldLight), contentAlignment = Alignment.Center) {
+                Text("MS", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = DarkCanvas)
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(state.userFullName, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextDark)
+                Text(state.userPhone, fontSize = 10.sp, color = TextMuted)
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        ProfileMenuRow("My Orders", onOpenOrders)
+        ProfileMenuRow("My Trials", onOpenTrials)
+        ProfileMenuRow("My Exchanges", onOpenExchanges)
+        ProfileMenuRow("Wishlist", onOpenWishlist)
+        ProfileMenuRow("Help & Support", onOpenSupport)
+        ProfileMenuRow("Logout", { vm.logout(); onLogout() }, isRed = true)
+    }
+}
+
+@Composable
+fun ProfileMenuRow(title: String, onClick: () -> Unit, isRed: Boolean = false) {
+    Row(modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Text(title, fontSize = 11.5.sp, fontWeight = FontWeight.Medium, color = if (isRed) RubyRed else TextDark)
+        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = TextMuted, modifier = Modifier.size(15.dp))
+    }
+}
+
+// --- 29. WISHLIST ---
+@Composable
+fun WishlistScreen(vm: MainViewModel, onBack: () -> Unit, onMoveToCart: (Product) -> Unit) {
+    val state by vm.state.collectAsState()
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("My Wishlist (${state.wishlist.size})", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextDark)
+        }
+        LazyVerticalGrid(columns = GridCells.Fixed(2), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(state.wishlist) { p ->
+                Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), shape = RoundedCornerShape(8.dp)) {
+                    Column(modifier = Modifier.padding(8.dp)) {
+                        Text(p.emoji, fontSize = 34.sp)
+                        Text(p.name, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                        Text("₹${p.price.toInt()}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Button(onClick = { onMoveToCart(p) }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), contentPadding = PaddingValues(0.dp), modifier = Modifier.fillMaxWidth().height(26.dp)) {
+                            Text("Move to Cart", fontSize = 8.5.sp, color = DarkCanvas)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- 30. HELP & SUPPORT ---
+@Composable
+fun HelpSupportScreen(onBack: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Help & Support", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        Text("Hi, How can we help you?", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = TextDark)
+        Spacer(modifier = Modifier.height(10.dp))
+        SupportCard("Chat with us", "We're online", Icons.Default.Email)
+        SupportCard("Call Support", "10 AM - 7 PM", Icons.Default.Phone)
+        SupportCard("FAQs", "Find answers", Icons.Default.Info)
+        SupportCard("Raise a Ticket", "We'll get back to you", Icons.Default.Share)
+    }
+}
+
+@Composable
+fun SupportCard(title: String, sub: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+        Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = GoldDark, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                Text(sub, fontSize = 9.5.sp, color = TextMuted)
+            }
+        }
+    }
+}
+
+// --- 3D VIRTUAL AR TRY-ON ---
+@Composable
+fun VirtualTryOnScreen(vm: MainViewModel, onBack: () -> Unit, onTryAtHome: () -> Unit, onBuyNow: () -> Unit) {
+    val context = LocalContext.current
+    val lifecycleOwner = context as? LifecycleOwner
+    val state by vm.state.collectAsState()
+    var hasCamera by remember { mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasCamera = it

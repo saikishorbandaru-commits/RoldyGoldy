@@ -24,22 +24,17 @@ jobs:
           flutter-version: '3.24.x'
           channel: 'stable'
 
-      - name: Clean and Create Flutter Android Project
+      - name: Recreate Android Project & Asset Folders
         run: |
-          rm -rf app build.gradle.kts settings.gradle.kts gradle.properties
-          flutter create --platforms=android --org com.roldygoldy .
+          mkdir -p assets/images assets/jewellery
+          flutter create --platforms=android --org com.roldygoldy --project-name roldygoldy_ui .
           flutter pub get
 
-      - name: Build Release APK
-        run: flutter build apk --release
+      - name: Build APK
+        run: flutter build apk --debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: RoldyGoldy-Flutter-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: RoldyGoldy-Flutter-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-debug.apk

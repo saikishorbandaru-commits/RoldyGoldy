@@ -72,9 +72,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-// ==========================================================
-// 🎨 EXACT LUXURY PALETTE (From App Screen Flowchart)
-// ==========================================================
+// ==========================================
+// 🎨 COMPLETE PALETTE & COLOR SYSTEM
+// ==========================================
 val DarkCanvas = Color(0xFF120C07)
 val DarkCard = Color(0xFF1C130D)
 val DarkSurface = Color(0xFF2B1E15)
@@ -87,36 +87,27 @@ val LightBorder = Color(0xFFEFE8DC)
 val TextDark = Color(0xFF1F1610)
 val TextMuted = Color(0xFF8C7E72)
 val EmeraldSuccess = Color(0xFF1B6B46)
-val EmeraldSoft = Color(0xFFE2F4EB)
+val EmeraldLight = Color(0xFFE2F4EB)
 val RubyRed = Color(0xFFA62435)
+val WineDark = Color(0xFF1B0512)
+val WineVelvet = Color(0xFF4A0A28)
+val WineRich = Color(0xFF6B1139)
+val IvorySilky = Color(0xFFFAF6EE)
+val GlassBorder = Color(0x33D4AF37)
 
 val DarkObsidianGrad = Brush.verticalGradient(listOf(DarkSurface, DarkCard, DarkCanvas))
 
 @Composable
 fun RoldyGoldyLogo(size: Int = 38, showSubtitle: Boolean = false, isDarkBg: Boolean = false) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = "RoldyGoldy",
-            fontSize = size.sp,
-            fontWeight = FontWeight.Bold,
-            color = if (isDarkBg) GoldLight else GoldDark,
-            letterSpacing = 1.sp
-        )
+        Text("RoldyGoldy", fontSize = size.sp, fontWeight = FontWeight.Bold, color = if (isDarkBg) GoldLight else GoldDark, letterSpacing = 1.sp)
         if (showSubtitle) {
-            Text(
-                text = "HER PRIDE • HER CHOICE • HER TRUST",
-                fontSize = (size * 0.22).sp,
-                fontWeight = FontWeight.Bold,
-                color = if (isDarkBg) GoldPrimary else TextMuted,
-                letterSpacing = 2.sp
-            )
+            Text("HER PRIDE • HER CHOICE • HER TRUST", fontSize = (size * 0.22).sp, fontWeight = FontWeight.Bold, color = if (isDarkBg) GoldPrimary else TextMuted, letterSpacing = 2.sp)
         }
     }
 }
 
-// ==========================================================
-// 📦 DATA MODELS
-// ==========================================================
+// --- DATA MODELS ---
 data class Product(
     val id: String, val name: String, val category: String, val price: Double, val originalPrice: Double,
     val emoji: String, val isTrialEligible: Boolean, val tag: String, val karatInfo: String,
@@ -131,7 +122,7 @@ data class OrderHistoryItem(val orderId: String, val productName: String, val em
 data class ExchangeSlip(val id: String, val materialCategory: String, val itemName: String, val weightGrams: Double, val grossValue: Double, val netCredit: Double, val otp: String = "ROEX123456", val date: String, val photoBitmap: Bitmap? = null)
 
 val sampleProducts = listOf(
-    Product("1", "Kundan Choker Necklace", "Bridal", 3499.0, 4899.0, "👑", true, "HOT", "1-Gram Matte Gold Plated", "48.5 g", "36.2 g", "Brass & Copper Core Alloy", "Kundan & Hydro Emeralds", "Adjustable 12–18 in", "Golden Zari Dori", "RG 1-Gram Certified", "Royal bridal choker set handcrafted with precision Kundan foil work."),
+    Product("1", "Kundan Choker Necklace", "Bridal", 3499.0, 4899.0, "👑", true, "HOT", "1-Gram Matte Gold Plated", "48.5 g", "36.2 g", "Brass & Copper Alloy", "Kundan & Hydro Emeralds", "Adjustable 12–18 in", "Golden Zari Dori", "RG 1-Gram Certified", "Royal bridal choker set handcrafted with precision Kundan foil work."),
     Product("2", "Korean Minimal Hoops", "Daily Wear", 349.0, 549.0, "💫", false, "NEW", "18K PVD Anti-Tarnish", "6.8 g", "6.8 g", "316L Surgical Titanium", "AAA+ Cubic Zirconia", "18mm Diameter", "Click-top Security Latch", "18K PVD Certified", "Waterproof and hypoallergenic daily-wear hoops."),
     Product("3", "Temple Deity Jhumka Set", "Temple", 1299.0, 1899.0, "🪔", true, "BESTSELLER", "Antique Micro-Gold Plated", "38.2 g", "30.5 g", "Bronze Alloy", "Kemp Stones & Pearls", "Adjustable 14–16 in", "Metallic Lobster Lock", "Micro-Gold Guaranteed Finish", "South Indian temple deity motif with ruby-red kemp stones."),
     Product("4", "Polki Bridal Maangtikka", "Bridal", 2899.0, 3599.0, "💍", true, "HOT", "Uncut Polki Foil Finish", "22.4 g", "18.1 g", "Copper & Silver Alloy", "Uncut Polki & Onyx Drops", "5.5 in Length", "Curved Hairpin Anchor Hook", "Artisan Certified", "Floral bridal maangtikka with silver foil polki setting.")
@@ -142,9 +133,7 @@ val sampleAddresses = listOf(
     Address("a2", "Office", "Meera Sharma", "Mindspace, Hitech City, Hyderabad", "500081", 4.1, isDefault = false)
 )
 
-// ==========================================================
-// 🧠 VIEWMODEL & APP STATE
-// ==========================================================
+// --- VIEWMODEL ---
 data class AppState(
     val isFirstTimeUser: Boolean = true,
     val isLoggedIn: Boolean = false,
@@ -317,9 +306,7 @@ class MainViewModel : ViewModel() {
     }
 }
 
-// ==========================================
-// 🚀 NAVIGATION ROUTER
-// ==========================================
+// --- ROUTER ---
 sealed class Screen(val route: String, val title: String) {
     data object Splash : Screen("splash", "Splash")
     data object Onboarding1 : Screen("onboarding1", "Onboarding 1")
@@ -467,9 +454,8 @@ fun AppNavigator(vm: MainViewModel = viewModel()) {
         }
     }
 }
-
 // ==========================================
-// 📱 SCREEN COMPOSABLES (01 TO 30)
+// ðŸ“± SCREEN COMPOSABLES (01 TO 30)
 // ==========================================
 
 // --- 01. SPLASH ---
@@ -481,7 +467,7 @@ fun SplashScreen(onFinish: () -> Unit) {
             RoldyGoldyLogo(size = 38, showSubtitle = true, isDarkBg = true)
             Spacer(modifier = Modifier.height(48.dp))
             Box(modifier = Modifier.size(160.dp).clip(CircleShape).background(GoldPrimary.copy(alpha = 0.12f)).border(2.dp, GoldPrimary.copy(alpha = 0.4f), CircleShape), contentAlignment = Alignment.Center) {
-                Text("👑", fontSize = 84.sp)
+                Text("ðŸ‘‘", fontSize = 84.sp)
             }
         }
     }
@@ -493,7 +479,7 @@ fun OnboardingScreen1(onNext: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
         Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(modifier = Modifier.size(190.dp).clip(RoundedCornerShape(24.dp)).background(GoldPrimary.copy(alpha = 0.15f)).border(1.5.dp, GoldPrimary, RoundedCornerShape(24.dp)), contentAlignment = Alignment.Center) {
-                Text("✨", fontSize = 84.sp)
+                Text("âœ¨", fontSize = 84.sp)
             }
             Spacer(modifier = Modifier.height(28.dp))
             Text("For Every You,\nFor Every Moment.", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = LightCanvas, textAlign = TextAlign.Center, lineHeight = 30.sp)
@@ -511,11 +497,11 @@ fun OnboardingScreen1(onNext: () -> Unit) {
 fun OnboardingScreen2(onNext: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize().background(DarkObsidianGrad).padding(24.dp)) {
         Column(modifier = Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-            OnboardingCard("👑", "Try at Home", "Book your favorite jewellery & try 3–4 pieces at home.")
+            OnboardingCard("ðŸ‘‘", "Try at Home", "Book your favorite jewellery & try 3â€“4 pieces at home.")
             Spacer(modifier = Modifier.height(12.dp))
-            OnboardingCard("♻️", "Exchange & Save", "Exchange your old jewellery and get instant cashback.")
+            OnboardingCard("â™»ï¸", "Exchange & Save", "Exchange your old jewellery and get instant cashback.")
             Spacer(modifier = Modifier.height(12.dp))
-            OnboardingCard("🛡️", "Trusted Quality", "Premium imitation jewellery with 6 months warranty.")
+            OnboardingCard("ðŸ›¡ï¸", "Trusted Quality", "Premium imitation jewellery with 6 months warranty.")
         }
         Button(onClick = onNext, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth().height(48.dp).align(Alignment.BottomCenter)) {
             Text("Next", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 14.sp)
@@ -588,7 +574,7 @@ fun AuthPhoneScreen(onContinue: (String) -> Unit) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Text("or continue with", fontSize = 11.sp, color = TextMuted) }
         Spacer(modifier = Modifier.height(14.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            SocialBtn("G"); Spacer(modifier = Modifier.width(12.dp)); SocialBtn("f"); Spacer(modifier = Modifier.width(12.dp)); SocialBtn("")
+            SocialBtn("G"); Spacer(modifier = Modifier.width(12.dp)); SocialBtn("f"); Spacer(modifier = Modifier.width(12.dp)); SocialBtn("ï£¿")
         }
         Spacer(modifier = Modifier.weight(1f))
         Text("By continuing, you agree to our\nTerms & Conditions & Privacy Policy", fontSize = 10.sp, color = TextMuted, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
@@ -621,7 +607,7 @@ fun OtpVerifyScreen(phone: String, onVerified: () -> Unit) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) { Text("Resend OTP in 00:28", fontSize = 11.sp, color = TextMuted) }
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text("Auto detecting OTP 246811 ✓", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
+            Text("Auto detecting OTP 246811 âœ“", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = onVerified, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(48.dp)) {
@@ -674,17 +660,17 @@ fun HomeScreen(vm: MainViewModel, onOpenPdp: (String) -> Unit, onOpenTrial: () -
                     }
                 }
                 Box(modifier = Modifier.size(68.dp).clip(RoundedCornerShape(10.dp)).background(GoldLight.copy(alpha = 0.25f)), contentAlignment = Alignment.Center) {
-                    Text("👑", fontSize = 36.sp)
+                    Text("ðŸ‘‘", fontSize = 36.sp)
                 }
             }
         }
 
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            HomeCatCircle("Daily Wear", "💫") { onOpenCategories() }
-            HomeCatCircle("Korean", "✨") { onOpenCategories() }
-            HomeCatCircle("Temple", "🪔") { onOpenCategories() }
-            HomeCatCircle("Bridal", "👑") { onOpenCategories() }
-            HomeCatCircle("New In", "💍") { onOpenCategories() }
+            HomeCatCircle("Daily Wear", "ðŸ’«") { onOpenCategories() }
+            HomeCatCircle("Korean", "âœ¨") { onOpenCategories() }
+            HomeCatCircle("Temple", "ðŸª”") { onOpenCategories() }
+            HomeCatCircle("Bridal", "ðŸ‘‘") { onOpenCategories() }
+            HomeCatCircle("New In", "ðŸ’") { onOpenCategories() }
         }
 
         Spacer(modifier = Modifier.height(18.dp))
@@ -703,7 +689,7 @@ fun HomeScreen(vm: MainViewModel, onOpenPdp: (String) -> Unit, onOpenTrial: () -
                         }
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(p.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 1)
-                            Text("₹${p.price.toInt()}", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                            Text("â‚¹${p.price.toInt()}", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
                         }
                     }
                 }
@@ -726,7 +712,7 @@ fun HomeCatCircle(title: String, icon: String, onClick: () -> Unit) {
 // --- 08. CATEGORIES ---
 @Composable
 fun CategoriesScreen(onSelectCategory: (String) -> Unit) {
-    val categories = listOf("Daily Wear" to "💫", "Korean" to "✨", "Temple" to "🪔", "Bridal" to "👑", "Necklaces" to "📿", "Earrings" to "💎", "Bangles" to "⭕", "Rings" to "💍", "Mangalsutra" to "🖤", "Sets" to "🎁", "Anklets" to "🦶", "Accessories" to "🪞")
+    val categories = listOf("Daily Wear" to "ðŸ’«", "Korean" to "âœ¨", "Temple" to "ðŸª”", "Bridal" to "ðŸ‘‘", "Necklaces" to "ðŸ“¿", "Earrings" to "ðŸ’Ž", "Bangles" to "â­•", "Rings" to "ðŸ’", "Mangalsutra" to "ðŸ–¤", "Sets" to "ðŸŽ", "Anklets" to "ðŸ¦¶", "Accessories" to "ðŸªž")
     Column(modifier = Modifier.fillMaxSize().background(LightCanvas)) {
         Surface(color = LightCard, shadowElevation = 1.dp) {
             Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) { Text("Categories", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextDark) }
@@ -768,7 +754,7 @@ fun CategoryListingScreen(catName: String, vm: MainViewModel, onBack: () -> Unit
                         }
                         Column(modifier = Modifier.padding(8.dp)) {
                             Text(p.name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextDark, maxLines = 1)
-                            Text("₹${p.price.toInt()}", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                            Text("â‚¹${p.price.toInt()}", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
                         }
                     }
                 }
@@ -814,9 +800,9 @@ fun ProductDetailScreen(product: Product, vm: MainViewModel, onBack: () -> Unit,
             Spacer(modifier = Modifier.height(12.dp))
             Text(product.name, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextDark)
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-                Text("₹${product.price.toInt()}", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
+                Text("â‚¹${product.price.toInt()}", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = TextDark)
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("₹${product.originalPrice.toInt()}", fontSize = 12.sp, color = TextMuted, textDecoration = TextDecoration.LineThrough)
+                Text("â‚¹${product.originalPrice.toInt()}", fontSize = 12.sp, color = TextMuted, textDecoration = TextDecoration.LineThrough)
             }
             Text("Inclusive of all taxes", fontSize = 10.sp, color = TextMuted)
             Spacer(modifier = Modifier.height(10.dp))
@@ -826,10 +812,10 @@ fun ProductDetailScreen(product: Product, vm: MainViewModel, onBack: () -> Unit,
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = onOpenVto, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(8.dp)) {
-                    Text("✨ 3D Mirror", fontSize = 11.sp, color = DarkCanvas, fontWeight = FontWeight.Bold)
+                    Text("âœ¨ 3D Mirror", fontSize = 11.sp, color = DarkCanvas, fontWeight = FontWeight.Bold)
                 }
                 OutlinedButton(onClick = onOpenChat, modifier = Modifier.weight(1f), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, DarkCanvas)) {
-                    Text("💬 Bargain Chat", fontSize = 11.sp, color = DarkCanvas, fontWeight = FontWeight.Bold)
+                    Text("ðŸ’¬ Bargain Chat", fontSize = 11.sp, color = DarkCanvas, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -862,7 +848,7 @@ fun TryAtHomeInfoScreen(onBookTrial: () -> Unit) {
         Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text("Trial Fee (Nominal)", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
-                Text("₹99 per slot (Adjustable on purchase)", fontSize = 10.sp, color = TextMuted)
+                Text("â‚¹99 per slot (Adjustable on purchase)", fontSize = 10.sp, color = TextMuted)
             }
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -921,7 +907,7 @@ fun SelectTimeSlotScreen(vm: MainViewModel, onBack: () -> Unit, onContinue: () -
         }
         Spacer(modifier = Modifier.weight(1f))
         Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
-            Text("Continue (Trial Fee ₹99)", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            Text("Continue (Trial Fee â‚¹99)", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
         }
     }
 }
@@ -943,7 +929,7 @@ fun TrialCartScreen(vm: MainViewModel, onBack: () -> Unit, onProceedToAddress: (
                     Text(p.emoji, fontSize = 22.sp); Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(p.name, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
-                        Text("₹${p.price.toInt()}", fontSize = 10.sp, color = TextMuted)
+                        Text("â‚¹${p.price.toInt()}", fontSize = 10.sp, color = TextMuted)
                     }
                     IconButton(onClick = { vm.removeProductFromTrialKit(p.id) }) { Icon(Icons.Default.Close, contentDescription = "X", tint = RubyRed, modifier = Modifier.size(16.dp)) }
                 }
@@ -952,7 +938,7 @@ fun TrialCartScreen(vm: MainViewModel, onBack: () -> Unit, onProceedToAddress: (
         TextButton(onClick = onAddMore) { Text("+ Add More", color = GoldDark, fontWeight = FontWeight.Bold, fontSize = 11.sp) }
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Trial Fee (Adjustable)", fontSize = 11.sp, color = TextMuted); Text("₹99", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark)
+            Text("Trial Fee (Adjustable)", fontSize = 11.sp, color = TextMuted); Text("â‚¹99", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = TextDark)
         }
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onProceedToAddress, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
@@ -985,7 +971,7 @@ fun TrialAddressScreen(vm: MainViewModel, onBack: () -> Unit, onContinue: () -> 
             }
         }
         Spacer(modifier = Modifier.weight(1f))
-        Text("Delivering within 15 km · Trial available in your area", fontSize = 10.sp, color = EmeraldSuccess, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text("Delivering within 15 km Â· Trial available in your area", fontSize = 10.sp, color = EmeraldSuccess, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onContinue, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
             Text("Continue", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 12.sp)
@@ -1038,7 +1024,7 @@ fun ExchangeHomeScreen(vm: MainViewModel, onGetQuote: () -> Unit) {
             val isSel = selectedMat == m
             Card(colors = CardDefaults.cardColors(containerColor = if (isSel) GoldLight.copy(alpha = 0.3f) else LightCard), border = BorderStroke(1.dp, if (isSel) GoldPrimary else LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp).clickable { selectedMat = m }) {
                 Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text("🪙", fontSize = 14.sp); Spacer(modifier = Modifier.width(8.dp))
+                    Text("ðŸª™", fontSize = 14.sp); Spacer(modifier = Modifier.width(8.dp))
                     Text(m, fontSize = 11.sp, color = TextDark, modifier = Modifier.weight(1f))
                     RadioButton(selected = isSel, onClick = { selectedMat = m }, colors = RadioButtonDefaults.colors(selectedColor = GoldDark))
                 }
@@ -1063,7 +1049,7 @@ fun ExchangeQuoteScreen(vm: MainViewModel, onBack: () -> Unit, onProceed: () -> 
         Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Estimated Value", fontSize = 11.sp, color = TextMuted)
-                Text("₹ 280", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                Text("â‚¹ 280", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = TextDark)
                 Text("(After quality check)", fontSize = 10.sp, color = TextMuted)
             }
         }
@@ -1113,7 +1099,7 @@ fun CartScreen(vm: MainViewModel, onBack: () -> Unit, onProceedCheckout: () -> U
                     Text(item.product.emoji, fontSize = 24.sp); Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(item.product.name, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
-                        Text("₹${item.product.price.toInt()}", fontSize = 10.sp, color = TextMuted)
+                        Text("â‚¹${item.product.price.toInt()}", fontSize = 10.sp, color = TextMuted)
                     }
                 }
             }
@@ -1122,12 +1108,12 @@ fun CartScreen(vm: MainViewModel, onBack: () -> Unit, onProceedCheckout: () -> U
         Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Scrap Cashback Applied", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
-                Text("- ₹280", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
+                Text("- â‚¹280", fontSize = 11.sp, color = EmeraldSuccess, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Total", fontSize = 12.sp, fontWeight = FontWeight.Bold); Text("₹4,518", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text("Total", fontSize = 12.sp, fontWeight = FontWeight.Bold); Text("â‚¹4,518", fontSize = 14.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(8.dp))
         Button(onClick = onProceedCheckout, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth().height(46.dp)) {
@@ -1295,7 +1281,7 @@ fun ProfileScreen(vm: MainViewModel, onOpenOrders: () -> Unit, onOpenTrials: () 
 fun ProfileMenuRow(title: String, onClick: () -> Unit, isRed: Boolean = false) {
     Row(modifier = Modifier.fillMaxWidth().clickable { onClick() }.padding(vertical = 10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
         Text(title, fontSize = 11.5.sp, fontWeight = FontWeight.Medium, color = if (isRed) RubyRed else TextDark)
-        Text("➔", color = TextMuted, fontSize = 12.sp)
+        Text("âž”", color = TextMuted, fontSize = 12.sp)
     }
 }
 
@@ -1314,7 +1300,7 @@ fun WishlistScreen(vm: MainViewModel, onBack: () -> Unit, onMoveToCart: (Product
                     Column(modifier = Modifier.padding(8.dp)) {
                         Text(p.emoji, fontSize = 34.sp)
                         Text(p.name, fontSize = 10.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                        Text("₹${p.price.toInt()}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text("â‚¹${p.price.toInt()}", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         Button(onClick = { onMoveToCart(p) }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), contentPadding = PaddingValues(0.dp), modifier = Modifier.fillMaxWidth().height(26.dp)) {
                             Text("Move to Cart", fontSize = 8.5.sp, color = DarkCanvas)
                         }
@@ -1344,4 +1330,166 @@ fun HelpSupportScreen(onBack: () -> Unit) {
 }
 
 @Composable
-fun SupportCard(title: String, su
+fun SupportCard(title: String, sub: String, icon: androidx.compose.ui.graphics.vector.ImageVector) {
+    Card(colors = CardDefaults.cardColors(containerColor = LightCard), border = BorderStroke(1.dp, LightBorder), modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+        Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(icon, contentDescription = null, tint = GoldDark, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                Text(sub, fontSize = 9.5.sp, color = TextMuted)
+            }
+        }
+    }
+}
+
+// --- 3D VIRTUAL AR TRY-ON ---
+@Composable
+fun VirtualTryOnScreen(vm: MainViewModel, onBack: () -> Unit, onTryAtHome: () -> Unit, onBuyNow: () -> Unit) {
+    val context = LocalContext.current
+    val lifecycleOwner = context as? LifecycleOwner
+    val state by vm.state.collectAsState()
+    var hasCamera by remember { mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { hasCamera = it }
+
+    LaunchedEffect(Unit) { if (!hasCamera) launcher.launch(Manifest.permission.CAMERA) }
+    var jewelryOffset by remember { mutableStateOf(Offset(0f, 50f)) }
+    var jewelryScale by remember { mutableFloatStateOf(1.0f) }
+
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        if (hasCamera && lifecycleOwner != null) {
+            AndroidView(
+                factory = { ctx ->
+                    val view = PreviewView(ctx)
+                    val providerFuture = ProcessCameraProvider.getInstance(ctx)
+                    providerFuture.addListener({
+                        try {
+                            val provider = providerFuture.get()
+                            val preview = Preview.Builder().build().also { it.setSurfaceProvider(view.surfaceProvider) }
+                            provider.unbindAll()
+                            provider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_FRONT_CAMERA, preview)
+                        } catch (e: Exception) { e.printStackTrace() }
+                    }, ContextCompat.getMainExecutor(ctx))
+                    view
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Row(modifier = Modifier.fillMaxWidth().padding(14.dp).align(Alignment.TopStart), horizontalArrangement = Arrangement.SpaceBetween) {
+            IconButton(onClick = onBack, modifier = Modifier.clip(CircleShape).background(Color.White.copy(0.8f))) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark)
+            }
+        }
+        Box(modifier = Modifier.fillMaxSize().pointerInput(Unit) { detectTransformGestures { _, pan, zoom, _ -> jewelryScale = (jewelryScale * zoom).coerceIn(0.6f, 2.2f); jewelryOffset = Offset(jewelryOffset.x + pan.x, jewelryOffset.y + pan.y) } }, contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.offset(x = jewelryOffset.x.dp, y = jewelryOffset.y.dp)) {
+                Text(state.activeVtoProduct.emoji, fontSize = (80 * jewelryScale).sp)
+            }
+        }
+        Surface(color = LightCard.copy(0.95f), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp), modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onTryAtHome, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(8.dp), border = BorderStroke(1.dp, GoldDark)) {
+                        Text("Try @Home", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DarkCanvas)
+                    }
+                    Button(onClick = { vm.addToCart(state.activeVtoProduct); onBuyNow() }, modifier = Modifier.weight(1f).height(42.dp), shape = RoundedCornerShape(8.dp), colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary)) {
+                        Text("Buy (â‚¹${state.activeVtoProduct.price.toInt()})", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- SELLER BARGAIN CHAT ---
+@Composable
+fun SellerChatScreen(product: Product, vm: MainViewModel, onBack: () -> Unit, onCheckout: () -> Unit) {
+    val state by vm.state.collectAsState()
+    var msgText by remember { mutableStateOf("") }
+    var offerInput by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Jaipur Jewels (${product.name.take(10)}â€¦)", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = TextDark) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TextDark) } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = LightCanvas)
+            )
+        }
+    ) { padding ->
+        Column(modifier = Modifier.fillMaxSize().padding(padding).background(LightCanvas)) {
+            LazyColumn(modifier = Modifier.weight(1f).padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                items(state.chatMessages) { msg ->
+                    val isBuyer = msg.senderId == "buyer"
+                    Column(horizontalAlignment = if (isBuyer) Alignment.End else Alignment.Start, modifier = Modifier.fillMaxWidth()) {
+                        Surface(shape = RoundedCornerShape(10.dp), color = if (isBuyer) GoldLight else LightCard, border = if (!isBuyer) BorderStroke(1.dp, LightBorder) else null, modifier = Modifier.widthIn(max = 250.dp)) {
+                            Column(modifier = Modifier.padding(8.dp)) {
+                                Text(msg.text, color = TextDark, fontSize = 11.sp)
+                                if (msg.counterAmount != null) {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Button(onClick = { vm.acceptCounterOffer(product.id, msg.counterAmount); vm.addToCart(product, msg.counterAmount); onCheckout() }, colors = ButtonDefaults.buttonColors(containerColor = EmeraldSuccess), shape = RoundedCornerShape(4.dp)) {
+                                        Text("Accept â‚¹${msg.counterAmount.toInt()}", color = LightCard, fontSize = 9.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Surface(color = LightCard, modifier = Modifier.fillMaxWidth()) {
+                Row(modifier = Modifier.padding(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Button(onClick = { showDialog = true }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(12.dp)) {
+                        Text("Bargain", color = DarkCanvas, fontSize = 9.5.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.width(6.dp))
+                    OutlinedTextField(value = msgText, onValueChange = { msgText = it }, placeholder = { Text("Messageâ€¦", fontSize = 10.sp) }, modifier = Modifier.weight(1f), singleLine = true)
+                    IconButton(onClick = { if (msgText.isNotBlank()) { vm.sendTextMessage(msgText); msgText = "" } }) {
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = GoldDark)
+                    }
+                }
+            }
+        }
+    }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Offer to Jeweller") },
+            text = { OutlinedTextField(value = offerInput, onValueChange = { offerInput = it }, label = { Text("Amount (â‚¹)") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)) },
+            confirmButton = { Button(onClick = { val amt = offerInput.toDoubleOrNull(); if (amt != null) vm.sendBargainOffer(product.id, amt); showDialog = false }) { Text("Send") } }
+        )
+    }
+}
+
+// --- 11b. ADDRESS BOOK ---
+@Composable
+fun AddressBookScreen(vm: MainViewModel, onBack: () -> Unit) {
+    val state by vm.state.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize().background(LightCanvas).padding(16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") }
+            Text("Saved Addresses", fontWeight = FontWeight.Bold, fontSize = 15.sp, color = TextDark)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        Button(onClick = { vm.autoDetectGps() }, colors = ButtonDefaults.buttonColors(containerColor = GoldPrimary), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Text("ðŸ“ Auto-Detect Live GPS Location", color = DarkCanvas, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        state.addresses.forEach { addr ->
+            val isSel = state.selectedAddress.id == addr.id
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 3.dp).clickable { vm.selectAddress(addr) },
+                colors = CardDefaults.cardColors(containerColor = if (isSel) GoldLight.copy(alpha = 0.25f) else LightCard),
+                border = BorderStroke(1.dp, if (isSel) GoldPrimary else LightBorder)
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("${addr.label} Â· ${addr.recipientName}", fontWeight = FontWeight.Bold, fontSize = 11.sp, color = TextDark)
+                        if (isSel) Surface(color = GoldPrimary, shape = RoundedCornerShape(4.dp)) { Text("Active", color = DarkCanvas, fontSize = 8.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)) }
+                    }
+                    Text(addr.addressLine, fontSize = 10.sp, color = TextMuted)
+                }
+            }
+        }
+    }
+}

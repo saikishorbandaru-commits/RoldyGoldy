@@ -2522,6 +2522,3 @@ fun AddressBookScreen(vm: MainViewModel, onBack: () -> Unit) {
         }
     }
 }
-}
-    }
-}
